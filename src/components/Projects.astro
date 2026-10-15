@@ -112,7 +112,7 @@ const t =
                       ? String(stars[entry.data.repo])
                       : ''
                   }
-                  data-card-cover={entry.data.logo ? `/apps/${entry.data.logo}/icon.png` : ''}
+                  data-card-cover={entry.data.logo ? `/apps/${entry.data.logo}/icon.webp` : ''}
                   data-card-cover-mode={entry.data.logo ? 'single' : 'none'}
                   data-card-monogram={initials(entry.data.title)}
                   data-card-repo={entry.data.repo ?? ''}
@@ -128,7 +128,7 @@ const t =
                   <div class="relative flex aspect-[3/2] items-center justify-center overflow-hidden border border-hairline bg-surface-1 transition-colors duration-200 group-hover:border-primary">
                     {entry.data.logo ? (
                       <img
-                        src={`/apps/${entry.data.logo}/icon.png`}
+                        src={`/apps/${entry.data.logo}/icon.webp`}
                         alt={`${entry.data.title} logo`}
                         loading="lazy"
                         class="h-[58%] w-auto"
