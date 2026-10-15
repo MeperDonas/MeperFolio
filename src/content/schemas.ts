@@ -25,6 +25,35 @@ export const projectsSchema = z.object({
   description: z.string(),
   stack: z.array(z.string()),
   url: optionalUrl,
+  /**
+   * Slug of the app's brand folder under `public/apps/` (see the MeperSoft brand
+   * pack). Drives the card cover; omitted when an app has no assets yet, and the
+   * card then falls back to a monogram.
+   */
+  logo: z.string().optional(),
+  /**
+   * Repository behind the card's GitHub button. Separate from `url` on purpose:
+   * `url` can be a live site, and a private repository must be left out rather
+   * than linked into a 404.
+   */
+  repo: z.string().url().optional(),
+});
+
+/**
+ * An Omarchy plugin (bar widget). `repo` is required because publishing is the
+ * point of this section; `url` stays optional for a future marketplace page.
+ */
+export const pluginsSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  version: z.string(),
+  kind: z.string(),
+  repo: z.string().url(),
+  url: optionalUrl,
+  /** Screenshot shown as the card cover, as in the Omarchy plugin registry. */
+  preview: z.string().optional(),
+  /** The plugin's own `manifest.json` id, shown as the registry reference. */
+  id: z.string().optional(),
 });
 
 export const certificationsSchema = z.object({
@@ -46,6 +75,7 @@ export const siteSchema = z.object({
     experience: z.string(),
     projects: z.string(),
     certifications: z.string(),
+    plugins: z.string(),
     contact: z.string(),
   }),
 });

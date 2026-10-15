@@ -3,6 +3,7 @@ import {
   aboutSchema,
   certificationsSchema,
   experienceSchema,
+  pluginsSchema,
   projectsSchema,
   siteSchema,
 } from '../src/content/schemas';
@@ -63,6 +64,43 @@ describe('content schemas', () => {
     expect(result.success).toBe(true);
   });
 
+  it('keeps the logo slug on a project entry so the card can resolve its cover', () => {
+    const result = projectsSchema.safeParse({
+      title: 'Meper-Pos',
+      description: 'Inventory app',
+      stack: ['Next.js'],
+      logo: 'meperpos',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.logo).toBe('meperpos');
+  });
+
+  it('keeps the repository behind the card GitHub button separate from the site url', () => {
+    const result = projectsSchema.safeParse({
+      title: 'Meper-Pos',
+      description: 'Inventory app',
+      stack: ['Next.js'],
+      url: 'https://gestion-inventario-app-navy.vercel.app',
+      repo: 'https://github.com/MeperDonas/MeperPOS',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.repo).toBe('https://github.com/MeperDonas/MeperPOS');
+    expect(result.data?.url).toBe('https://gestion-inventario-app-navy.vercel.app');
+  });
+
+  it('leaves the logo undefined when a project has no cover asset', () => {
+    const result = projectsSchema.safeParse({
+      title: 'Vidmetrics',
+      description: 'Metrics dashboard',
+      stack: ['Next.js'],
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.logo).toBeUndefined();
+  });
+
   it('rejects a project entry with an invalid URL', () => {
     const result = projectsSchema.safeParse({
       title: 'Portfolio',
@@ -86,6 +124,7 @@ describe('content schemas', () => {
         experience: 'Experience',
         projects: 'Projects',
         certifications: 'Certifications',
+        plugins: 'Plugins',
         contact: 'Contact',
       },
     });
@@ -105,6 +144,7 @@ describe('content schemas', () => {
         experience: 'Experience',
         projects: 'Projects',
         certifications: 'Certifications',
+        plugins: 'Plugins',
         contact: 'Contact',
       },
     });
@@ -135,6 +175,77 @@ describe('content schemas', () => {
     const result = certificationsSchema.safeParse({
       title: 'AWS Certified Developer',
       date: '2023-05',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts a valid plugin entry with a repository and a version', () => {
+    const result = pluginsSchema.safeParse({
+      title: 'devstack',
+      description: 'Local dev stacks in one bar icon.',
+      version: '1.10.3',
+      kind: 'bar-widget',
+      repo: 'https://github.com/MeperDonas/omarchy-devstack',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('keeps the preview path on a plugin entry so the card can resolve its cover', () => {
+    const result = pluginsSchema.safeParse({
+      title: 'devstack',
+      description: 'Local dev stacks in one bar icon.',
+      version: '1.10.3',
+      kind: 'bar-widget',
+      repo: 'https://github.com/MeperDonas/omarchy-devstack',
+      preview: '/plugins/devstack.png',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.preview).toBe('/plugins/devstack.png');
+  });
+
+  it('keeps the manifest id on a plugin entry for the registry-style card', () => {
+    const result = pluginsSchema.safeParse({
+      title: 'devstack',
+      description: 'Local dev stacks in one bar icon.',
+      version: '1.10.3',
+      kind: 'bar-widget',
+      repo: 'https://github.com/MeperDonas/omarchy-devstack',
+      id: 'meperdonas.devstack',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.id).toBe('meperdonas.devstack');
+  });
+
+  it('rejects a plugin entry whose repository is not a URL', () => {
+    const result = pluginsSchema.safeParse({
+      title: 'devstack',
+      description: 'Local dev stacks in one bar icon.',
+      version: '1.10.3',
+      kind: 'bar-widget',
+      repo: 'MeperDonas/omarchy-devstack',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects a site entry whose nav omits the plugins label', () => {
+    const result = siteSchema.safeParse({
+      name: 'Jane Doe',
+      role: 'Frontend Developer',
+      email: 'jane@example.com',
+      linkedin: 'https://linkedin.com/in/jane',
+      github: 'https://github.com/jane',
+      nav: {
+        about: 'About',
+        experience: 'Experience',
+        projects: 'Projects',
+        certifications: 'Certifications',
+        contact: 'Contact',
+      },
     });
 
     expect(result.success).toBe(false);

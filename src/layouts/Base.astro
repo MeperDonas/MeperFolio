@@ -1,6 +1,6 @@
 ---
 import '@fontsource-variable/geist';
-import '@fontsource-variable/geist-mono';
+import '@fontsource-variable/jetbrains-mono';
 import Analytics from '@vercel/analytics/astro';
 import '../styles/global.css';
 
@@ -22,9 +22,51 @@ const siteUrl = 'https://meperfolio.vercel.app';
          never a flash of invisible content before the app module loads, and a
          no-JS visitor sees everything rendered. -->
     <script is:inline>document.documentElement.classList.add('js');</script>
+    <!--
+      Pre-paint theme selection, mirroring the omarchy mechanic documented in
+      DESIGN-omarchy.md: reuse the stored palette, otherwise draw one at random
+      from the dark or light pool by colour-scheme preference, persist it, and
+      set it on <html> before anything paints. Deliberately dependency-free and
+      wrapped so it can never throw before first paint. The switcher in
+      SiteNav.astro and the theme-color sync in scripts/app.ts build on this.
+    -->
+    <script is:inline>
+      (function () {
+        var KEY = 'meperfolio-theme';
+        var DARK = [
+          'catppuccin', 'ethereal', 'everforest', 'gruvbox', 'hackerman',
+          'kanagawa', 'last-horizon', 'lumon', 'matte-black', 'miasma', 'nord',
+          'osaka-jade', 'retro-82', 'ristretto', 'solitude', 'tokyo-night',
+          'vantablack'
+        ];
+        var LIGHT = ['catppuccin-latte', 'flexoki-light', 'lupine', 'rose-pine', 'white'];
+        var ALL = DARK.concat(LIGHT);
+        function apply(name) {
+          document.documentElement.dataset.theme = name;
+          // Palette *kind*, not the palette itself: lets CSS pick a light or dark
+          // asset variant without listing every theme name in a selector.
+          document.documentElement.dataset.mode = LIGHT.indexOf(name) >= 0 ? 'light' : 'dark';
+        }
+        try {
+          var stored = null;
+          try { stored = localStorage.getItem(KEY); } catch (e) {}
+          var name = stored && ALL.indexOf(stored) >= 0 ? stored : null;
+          if (!name) {
+            var prefersLight = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches;
+            var pool = prefersLight ? LIGHT : DARK;
+            name = pool[Math.floor(Math.random() * pool.length)];
+            try { localStorage.setItem(KEY, name); } catch (e) {}
+          }
+          apply(name);
+        } catch (e) {
+          apply('tokyo-night');
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#010102" />
+    <!-- tokyo-night canvas; scripts/app.ts re-syncs this to the live --t-bg. -->
+    <meta name="theme-color" content="#1a1b26" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     <meta property="og:type" content="website" />

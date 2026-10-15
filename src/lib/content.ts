@@ -20,7 +20,7 @@ export function filterByLocale<T extends { id: string }>(entries: T[], locale: s
 }
 
 /** The names of every content collection this site reads from. */
-type ContentCollection = 'about' | 'experience' | 'projects' | 'certifications' | 'site';
+type ContentCollection = 'about' | 'experience' | 'projects' | 'plugins' | 'certifications' | 'site';
 
 /**
  * Shared loader: resolves a collection through the Astro runtime and keeps
@@ -40,6 +40,8 @@ export const getAbout = (locale: Locale) => getByLocale('about', locale);
 export const getExperience = (locale: Locale) => getByLocale('experience', locale);
 
 export const getProjects = (locale: Locale) => getByLocale('projects', locale);
+
+export const getPlugins = (locale: Locale) => getByLocale('plugins', locale);
 
 export const getCertifications = (locale: Locale) => getByLocale('certifications', locale);
 
