@@ -5,5 +5,5 @@ version: 1.0.0
 kind: bar-widget
 id: meperdonas.work-vpn
 repo: https://github.com/MeperDonas/omarchy-work-vpn
-preview: /plugins/mepersoft-tile.webp
+preview: /plugins/work-connection.webp
 ---

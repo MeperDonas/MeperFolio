@@ -112,32 +112,27 @@ const t =
                       ? String(stars[entry.data.repo])
                       : ''
                   }
-                  data-card-cover={entry.data.logo ? `/apps/${entry.data.logo}` : ''}
-                  data-card-cover-mode={entry.data.logo ? 'lockup' : 'none'}
+                  data-card-cover={entry.data.logo ? `/apps/${entry.data.logo}/icon.png` : ''}
+                  data-card-cover-mode={entry.data.logo ? 'single' : 'none'}
                   data-card-monogram={initials(entry.data.title)}
                   data-card-repo={entry.data.repo ?? ''}
                   data-card-site={entry.data.url ?? ''}
                   aria-label={`${t.open} ${entry.data.title}`}
                 >
-                  {/* 3:2 rather than 4:3: the cover dominates the card's height, and
-                      the owner preferred the tighter card that left the deck column
-                      some air instead of filling it top to bottom. */}
+                  {/*
+                    The square icon, not the horizontal lockup. A lockup is a ~4:1
+                    strip, so inside this box its wordmark rendered tiny - and the
+                    title is already text right below it. The icon also needs no
+                    dark/light variant, because it carries its own coloured tile.
+                  */}
                   <div class="relative flex aspect-[3/2] items-center justify-center overflow-hidden border border-hairline bg-surface-1 transition-colors duration-200 group-hover:border-primary">
                     {entry.data.logo ? (
-                      <>
-                        <img
-                          src={`/apps/${entry.data.logo}/lockup-dark.png`}
-                          alt={`${entry.data.title} logo`}
-                          loading="lazy"
-                          class="asset-dark w-3/5"
-                        />
-                        <img
-                          src={`/apps/${entry.data.logo}/lockup-light.png`}
-                          alt={`${entry.data.title} logo`}
-                          loading="lazy"
-                          class="asset-light w-3/5"
-                        />
-                      </>
+                      <img
+                        src={`/apps/${entry.data.logo}/icon.png`}
+                        alt={`${entry.data.title} logo`}
+                        loading="lazy"
+                        class="h-[58%] w-auto"
+                      />
                     ) : (
                       <span class="font-mono text-3xl tracking-[0.1em] text-ink-tertiary" aria-hidden="true">
                         {initials(entry.data.title)}

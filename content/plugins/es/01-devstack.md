@@ -5,5 +5,5 @@ version: 1.10.3
 kind: bar-widget
 id: meperdonas.devstack
 repo: https://github.com/MeperDonas/omarchy-devstack
-preview: /plugins/mepersoft-tile.webp
+preview: /plugins/devstack.webp
 ---
