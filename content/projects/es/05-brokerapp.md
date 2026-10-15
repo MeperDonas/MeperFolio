@@ -7,5 +7,4 @@ stack:
   - PostgreSQL
   - TypeScript
 logo: brokerapp
-url: https://broker.mepersoft.app
 ---
