@@ -7,5 +7,4 @@ stack:
   - Astro
   - PostgreSQL
 logo: mepersoft
-url: https://mepersoft.app
 ---
