@@ -78,6 +78,26 @@ describe('structural invariants', () => {
     expect(appTs).toContain('panel?.focus()');
   });
 
+  it('keeps every page-level control in the one cluster', () => {
+    // The palette trigger and the language switch used to sit at the top of the
+    // identity column, which left two control groups on the same band. They belong
+    // to the cluster at the top-right of <main>, which is also the only one that
+    // escapes the column's overflow clipping.
+    const from = index.indexOf('bottom-4 right-4');
+    const to = index.indexOf('data-theme-menu');
+    expect(from, 'the cluster must exist').toBeGreaterThan(0);
+    expect(to, 'the theme menu must exist').toBeGreaterThan(from);
+
+    const cluster = index.slice(from, to);
+    expect(cluster).toContain('data-cmdk-open');
+    expect(cluster).toMatch(/<LanguageToggle/);
+
+    // And nothing above the cluster - that is, inside the identity column - may
+    // hold them again.
+    const column = index.slice(index.indexOf('<aside'), from);
+    expect(column).not.toMatch(/data-cmdk-open|<LanguageToggle/);
+  });
+
   it('keeps the card buttons the only modal trigger', () => {
     // The palette rows and the cards are activated by delegation, so nothing may
     // nest an interactive element inside a card button.

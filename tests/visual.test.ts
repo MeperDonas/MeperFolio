@@ -263,7 +263,12 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
       await scrollToBottom(page);
       await new Promise((resolve) => setTimeout(resolve, 400));
 
-      for (const selector of ['[data-theme-toggle]', '[data-scroll-top]']) {
+      for (const selector of [
+        '[data-cmdk-open]',
+        '[data-locale-toggle]',
+        '[data-theme-toggle]',
+        '[data-scroll-top]',
+      ]) {
         const box = await page.$eval(selector, (el) => {
           const rect = el.getBoundingClientRect();
           return { top: rect.top, bottom: rect.bottom, height: rect.height };
@@ -273,6 +278,19 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
         expect(box.top, `${selector} scrolled off the top`).toBeGreaterThanOrEqual(0);
         expect(box.bottom, `${selector} scrolled off the bottom`).toBeLessThanOrEqual(DESKTOP.height + 1);
       }
+
+      // One cluster, not two: the reading of this check is a shared parent, which
+      // fails if any control drifts back to the identity column.
+      expect(
+        await page.evaluate(() => {
+          const anchor = document.querySelector('[data-theme-toggle]')?.parentElement;
+          const others = ['[data-cmdk-open]', '[data-locale-toggle]', '[data-scroll-top]'].map(
+            (selector) => document.querySelector(selector)?.parentElement,
+          );
+          return !!anchor && others.every((parent) => parent === anchor);
+        }),
+        'every page-level control must share one cluster',
+      ).toBe(true);
       await page.close();
     },
     TEST_TIMEOUT,

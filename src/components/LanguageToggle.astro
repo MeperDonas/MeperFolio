@@ -2,13 +2,23 @@
 // Presentational ES/EN switch. The page-level i18n script binds to the
 // `[data-locale-toggle]` button and flips the `[data-locale]` labels below,
 // so this component owns no state and imports no logic.
+//
+// The chrome matches the other page-level controls so it can sit inside the
+// cluster at the top-right of <main>; the caller passes the size it needs.
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
 ---
 
 <button
   type="button"
   data-locale-toggle
   aria-label="Toggle language"
-  class="rounded-md border border-hairline px-2.5 py-1 text-xs font-medium text-ink-subtle transition-colors duration-200 hover:border-hairline-strong hover:bg-surface-1 hover:text-ink"
+  class:list={[
+    'flex items-center justify-center border border-hairline bg-surface-1 px-3 py-1.5 text-xs font-medium text-ink-subtle transition-colors duration-200 hover:border-hairline-strong hover:text-ink',
+    className,
+  ]}
 >
   <span data-locale="es">ES</span>
   <span data-locale="en" hidden>EN</span>

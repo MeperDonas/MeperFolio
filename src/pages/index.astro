@@ -143,12 +143,38 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
     class="relative mx-auto max-w-7xl lg:grid lg:h-screen lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-20 lg:overflow-hidden"
   >
     <!--
-      Page-level controls, anchored to the top-right corner of the content area.
-      Absolute on purpose: they sit outside the identity column, which clips its
-      overflow, and outside the deck, which scrolls internally, so the palette
-      panel can never be cut off no matter how tall it grows.
+      One cluster for every page-level control: the palette trigger, the language
+      switch, back-to-top and the theme switcher. Fixed rather than absolute on
+      purpose - they sit outside the identity column, which clips its overflow,
+      and outside the deck, which scrolls internally - so the palette panel can
+      never be cut off no matter how tall it grows, and the controls stay
+      reachable while the page scrolls.
     -->
     <div class="fixed bottom-4 right-4 z-30 flex items-center gap-2 lg:bottom-auto lg:right-6 lg:top-6">
+      <button
+        type="button"
+        data-cmdk-open
+        aria-label="Command palette (Ctrl+K)"
+        title="Ctrl+K"
+        class="flex h-10 w-10 items-center justify-center border border-hairline bg-surface-1 text-ink-subtle transition-colors duration-200 hover:border-hairline-strong hover:text-ink"
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
+
+      <LanguageToggle class="h-10" />
+
       <a
         href="#top"
         data-scroll-top
@@ -217,36 +243,6 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
          content on short viewports and overflow:hidden guarantees it never
          scrolls internally. -->
     <aside class="identity-col flex flex-col px-6 pb-8 pt-8 lg:h-full lg:min-h-0 lg:overflow-hidden lg:px-10 lg:py-10">
-      <!--
-        Navigation controls. The palette switcher and the back-to-top anchor now
-        live in the cluster at the top-right of <main>, so this row keeps only
-        the command palette and the language switch.
-      -->
-      <div class="flex items-center justify-end gap-2">
-          <button
-            type="button"
-            data-cmdk-open
-            aria-label="Command palette (Ctrl+K)"
-            title="Ctrl+K"
-            class="flex h-7 w-7 items-center justify-center rounded-md text-ink-subtle transition-colors duration-200 hover:bg-surface-1 hover:text-ink"
-          >
-            <svg
-              class="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-          </button>
-          <LanguageToggle />
-      </div>
-
       <div class="hero-wrap mt-10 lg:mt-14">
         <Hero
           locale="es"
