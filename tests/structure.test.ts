@@ -4,9 +4,10 @@ import plugins from '../src/components/Plugins.astro?raw';
 import siteNav from '../src/components/SiteNav.astro?raw';
 import index from '../src/pages/index.astro?raw';
 import globalCss from '../src/styles/global.css?raw';
+import themesCss from '../src/styles/themes.css?raw';
 
 /**
- * Structural invariants.
+ * Structural and appearance invariants.
  *
  * This is the regression net for the class of bug that unit tests did not catch
  * this session. Every one of these broke once, was found by hand in a browser,
@@ -14,11 +15,11 @@ import globalCss from '../src/styles/global.css?raw';
  * frame overlaps or stacks, whether the nav is centred, or whether an icon points
  * at a file that no longer exists.
  *
- * They are asserted against the component sources rather than rendered output on
- * purpose: no browser dependency, no CI cost, and it pins the exact structural
- * decision instead of its pixel result. Real visual coverage (computed geometry
- * and colour over the built page) would need a headless browser in the suite, and
- * that is a separate call.
+ * Assertions run against the sources rather than rendered output on purpose: no
+ * browser dependency, no CI cost, and they pin the structural or token decision
+ * instead of its pixel result. What they still cannot see is the computed
+ * geometry and colour of the built page; that needs a headless browser in the
+ * suite and is a dependency decision of its own.
  */
 describe('structural invariants', () => {
   it('keeps the paged frames overlapping in one grid cell', () => {
@@ -66,5 +67,45 @@ describe('structural invariants', () => {
     // nest an interactive element inside a card button.
     expect(projects).toContain('data-card-open');
     expect(projects).not.toMatch(/data-card-open[\s\S]{0,600}<a\s/);
+  });
+});
+
+describe('appearance invariants', () => {
+  it('keeps the radius ladder at zero', () => {
+    // Omarchy's hard-edged surfaces are the system's identity. The library radii
+    // are zeroed in global.css while rounded-full circles stay available, so a
+    // soft radius creeping back into the ladder is a theme regression.
+    for (const token of ['sm', 'md', 'lg', 'xl']) {
+      expect(globalCss, `--radius-${token} must stay 0px`).toContain(`--radius-${token}: 0px`);
+    }
+  });
+
+  it('expresses depth as a ring, not a blurred shadow', () => {
+    // Depth is a 1px white-alpha ring. The floating panels take the ring token, so
+    // a literal blurred shadow would mean the rule was replaced by hand.
+    expect(globalCss).toContain('--shadow-elevation: var(--t-elevation)');
+    expect(globalCss).toMatch(/\.card-modal-panel[\s\S]{0,300}var\(--shadow-elevation-hover\)/);
+    expect(globalCss).not.toMatch(/\.card-modal-panel[\s\S]{0,300}\d+px\s+\d+px\s+rgba/);
+  });
+
+  it('keeps both palettes and their selector specificity intact', () => {
+    // The cascade bug: a bare `[data-theme=x]` ties with `:root`, so the minifier
+    // could pin every theme to the fallback. themes.test.ts owns the detail; this
+    // is the cheap tripwire next to the other appearance rules.
+    expect(themesCss).toContain('html[data-theme="tokyo-night"]');
+    expect(themesCss.match(/^:root\s*\{/gm)?.length).toBe(1);
+  });
+
+  it('ships the checkerboard cover for plugins without a screenshot', () => {
+    // The registry look depends on the grid field existing as a class, not only on
+    // the utility being applied inline.
+    expect(globalCss).toContain('.theme-grid');
+    expect(plugins).toContain('theme-grid');
+  });
+
+  it('keeps the swatch dot and the active check wired to the palette state', () => {
+    // The check follows `aria-selected` through CSS rather than a JS-set class, so
+    // the rule has to exist for the active palette to be readable.
+    expect(globalCss).toContain("[data-theme-option][aria-selected='true'] [data-theme-check]");
   });
 });
