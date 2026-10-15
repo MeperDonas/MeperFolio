@@ -290,16 +290,17 @@ function scrollToSection(target: HTMLElement): void {
 }
 
 // --- Command palette (Ctrl/Cmd+K) --------------------------------------------
-// Searchable launcher for sections and quick actions. The hidden state is
-// driven by the [hidden] attribute so the global i18n toggle keeps working.
+// Keyboard launcher for sections and quick actions. Seven rows fit on one screen,
+// so there is no text field and nothing is filtered: the arrows move the selection
+// and Enter runs it. The hidden state is driven by the [hidden] attribute so the
+// global i18n toggle keeps working.
 const cmdkRoot = document.querySelector<HTMLElement>('[data-cmdk]');
 let paletteOpen = false;
 
 if (cmdkRoot) {
-  const input = cmdkRoot.querySelector<HTMLInputElement>('[data-cmdk-input]');
+  const panel = cmdkRoot.querySelector<HTMLElement>('[data-cmdk-panel]');
   const listEl = cmdkRoot.querySelector<HTMLElement>('[data-cmdk-list]');
   const allItems = () => Array.from(listEl?.querySelectorAll<HTMLElement>('[data-cmdk-item]') ?? []);
-  const visibleItems = () => allItems().filter((item) => !item.hidden);
 
   const setSelected = (target: HTMLElement | null) => {
     for (const item of allItems()) {
@@ -314,19 +315,6 @@ if (cmdkRoot) {
     }
   };
 
-  const applyFilter = () => {
-    if (!input) return;
-    const query = input.value.trim().toLowerCase();
-    let firstVisible: HTMLElement | null = null;
-    for (const item of allItems()) {
-      const match = !query || (item.textContent?.toLowerCase().includes(query) ?? false);
-      item.hidden = !match;
-      if (item.parentElement) item.parentElement.hidden = !match;
-      if (match && !firstVisible) firstVisible = item;
-    }
-    setSelected(firstVisible);
-  };
-
   function closePalette() {
     paletteOpen = false;
     if (cmdkRoot) cmdkRoot.hidden = true;
@@ -335,11 +323,11 @@ if (cmdkRoot) {
   function openPalette() {
     paletteOpen = true;
     if (cmdkRoot) cmdkRoot.hidden = false;
-    if (input) {
-      input.value = '';
-      applyFilter();
-      input.focus();
-    }
+    // Focus goes to the panel, which is what receives the arrow keys. A text
+    // input here also handed the palette to the browser's password manager on
+    // every open, for a filter seven fixed rows never needed.
+    setSelected(allItems()[0] ?? null);
+    panel?.focus();
   }
 
   const executeItem = (item: HTMLElement) => {
@@ -414,15 +402,15 @@ if (cmdkRoot) {
   });
   cmdkRoot.querySelector('[data-cmdk-close]')?.addEventListener('click', closePalette);
 
-  input?.addEventListener('input', applyFilter);
-
-  input?.addEventListener('keydown', (event: KeyboardEvent) => {
+  // Bound to the root, not to a row: keydown bubbles here from the focused panel
+  // and from any row a click or Tab may have focused.
+  cmdkRoot.addEventListener('keydown', (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       event.stopPropagation(); // keep the page-level Escape handler out
       closePalette();
       return;
     }
-    const visible = visibleItems();
+    const visible = allItems();
     if (visible.length === 0) return;
     const current = visible.findIndex((item) => item.classList.contains('is-selected'));
     if (event.key === 'ArrowDown') {

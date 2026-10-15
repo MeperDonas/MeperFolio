@@ -593,15 +593,14 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
 
   <div class="cmdk" data-cmdk hidden>
     <div class="cmdk-backdrop" data-cmdk-close></div>
-    <div class="cmdk-panel" role="dialog" aria-modal="true" aria-label="Command palette">
-      <input
-        data-cmdk-input
-        type="text"
-        autocomplete="off"
-        spellcheck="false"
-        aria-label="Search commands"
-        placeholder="Escribí un comando…"
-      />
+    <div
+      class="cmdk-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Command palette"
+      data-cmdk-panel
+      tabindex="-1"
+    >
       <ul class="cmdk-list" data-cmdk-list role="listbox" aria-label="Commands">
         <li role="presentation">
           <button type="button" class="cmdk-item" role="option" data-cmdk-item data-cmdk-goto="about">

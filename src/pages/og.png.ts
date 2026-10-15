@@ -132,7 +132,11 @@ export const GET: APIRoute = async () => {
   const svg = await renderSatori(ogTree(site.name, site.role, head, body), { width: 1200, height: 630, fonts });
 
   const png = new Resvg(svg).render().asPng();
-  return new Response(png, {
+  // A copy, not a cast. Node's Buffer is a valid body at runtime, but its type is
+  // not assignable to the DOM's BodyInit once @types/node joins the program.
+  // Copying feeds exactly png's bytes, where handing over png.buffer could carry
+  // the rest of Node's allocation pool.
+  return new Response(new Uint8Array(png), {
     headers: { 'Content-Type': 'image/png' },
   });
 };
