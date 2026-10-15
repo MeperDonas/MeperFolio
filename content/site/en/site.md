@@ -10,5 +10,6 @@ nav:
   experience: Experience
   projects: Projects
   certifications: Certifications
+  plugins: Plugins
   contact: Contact
 ---

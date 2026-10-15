@@ -1,11 +1,13 @@
 ---
 title: Meper-Pos
-description: Web application for inventory, sales, and customer management for small businesses.
+description: "Multi-tenant POS and inventory control: each organization owns its products, sales and numbering sequences. Inventory movements cover purchases, sales, adjustments, damage and returns, and a sale can split payment across cash, card and transfer. Optimistic concurrency on products stops two registers from overwriting the same stock. Built for the Colombian context: COP currency and es-CO locale."
 stack:
   - Next.js
   - NestJS
   - PostgreSQL
   - Prisma
   - TypeScript
+logo: meperpos
 url: https://github.com/MeperDonas/gestion-inventario-app
+repo: https://github.com/MeperDonas/MeperPOS
 ---
