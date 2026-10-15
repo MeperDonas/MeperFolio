@@ -9,74 +9,163 @@ interface Props {
   title: string;
   entries: CollectionEntry<'projects'>[];
   hidden?: boolean;
+  /** Build-time GitHub star counts keyed by repo URL; absent when unavailable. */
+  stars?: Record<string, number>;
 }
 
-const { locale, index, title, entries, hidden } = Astro.props;
+const { locale, index, title, entries, hidden, stars } = Astro.props;
+
+/** Four per page, as requested, behind one static frame. */
+const PER_PAGE = 4;
+
+const pages: CollectionEntry<'projects'>[][] = [];
+for (let i = 0; i < entries.length; i += PER_PAGE) {
+  pages.push(entries.slice(i, i + PER_PAGE));
+}
+
+const paged = pages.length > 1;
+const pad = (n: number) => String(n).padStart(2, '0');
+const initials = (value: string) =>
+  value
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join('')
+    .toUpperCase();
+
+const t =
+  locale === 'es'
+    ? { prev: 'Proyectos anteriores', next: 'Proyectos siguientes', open: 'Ver detalle de' }
+    : { prev: 'Previous projects', next: 'Next projects', open: 'View details for' };
 ---
 
-{entries.length > 0 && (
-  <section data-locale={locale} class="py-section" hidden={hidden || undefined}>
-    <div class="px-6">
-      <p class="section-eyebrow" data-reveal>{index}</p>
-      <h2 class="mt-4 text-display-md text-ink" data-reveal>
-        {title}
-      </h2>
-      <div class="mt-12 grid gap-6 sm:grid-cols-2">
-        {
-          entries.map((entry, i) => {
-            // Lead tech drives the card's accent hue (ghost index + hover
-            // border); each stack chip tints itself with its own hue.
-            const cardAccent =
-              entry.data.stack.length > 0 ? tagHue(entry.data.stack[0]) : undefined;
-            return (
-              <article
-                class="card project-card reveal-card group flex aspect-4/5 flex-col"
-                data-reveal
-                style={cardAccent ? `--card-accent: ${cardAccent}` : undefined}
-              >
-                <span class="project-ghost" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div class="relative mt-1 flex items-start justify-between gap-4">
-                  <h3 class="text-card-title text-ink">{entry.data.title}</h3>
-                  {entry.data.url && (
-                    <a
-                      href={entry.data.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={entry.data.title}
-                      class="project-link"
-                    >
-                      <svg
-                        class="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M7 17L17 7M9 7h8v8"></path>
-                      </svg>
-                    </a>
-                  )}
-                </div>
-                <p class="relative mt-3 line-clamp-3 text-sm leading-relaxed text-ink-muted">
-                  {entry.data.description}
-                </p>
-                <ul class="relative mt-auto flex flex-wrap gap-2 border-t border-hairline pt-4">
-                  {entry.data.stack.map((tech) => (
-                    <li class="tag" style={`--tag-accent: ${tagHue(tech)}`}>
-                      {tech}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            );
-          })
-        }
+{
+  entries.length > 0 && (
+    <section data-locale={locale} class="py-section" hidden={hidden || undefined}>
+      <div class="px-6">
+        <p class="section-eyebrow" data-reveal>
+          {index}
+        </p>
+        <h2 class="mt-4 text-display-md text-ink" data-reveal>
+          {title}
+        </h2>
+
+        {/* The two arrows are the tabber, one at each end above the grid. */}
+        {paged && (
+          <div class="mt-10 flex items-center justify-between gap-4">
+            <button
+              type="button"
+              data-project-prev
+              aria-label={t.prev}
+              class="flex size-11 items-center justify-center border border-hairline-strong bg-surface-1 text-ink transition-colors duration-200 hover:border-primary hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-40"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-5">
+                <path d="M14.5 18.25L8.25 12L14.5 5.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" />
+              </svg>
+            </button>
+
+            <p
+              class="font-mono text-[11px] tracking-[0.08em] text-ink-tertiary tabular-nums"
+              data-project-counter
+            >
+              {pad(1)} / {pad(pages.length)}
+            </p>
+
+            <button
+              type="button"
+              data-project-next
+              aria-label={t.next}
+              class="flex size-11 items-center justify-center border border-hairline-strong bg-surface-1 text-ink transition-colors duration-200 hover:border-primary hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-40"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-5">
+                <path d="M9.5 18.25L15.75 12L9.5 5.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/*
+          One static frame, pages swapped behind it. Every page is a child of the
+          SAME grid cell, so they overlap and the container is always as tall as
+          the fullest page. Inactive pages are hidden by visibility rather than
+          `display: none`: out of layout they would stop contributing that height.
+        */}
+        <div class="mt-6 grid" data-project-pages>
+          {pages.map((page, pageIndex) => (
+            <div
+              class="project-page col-start-1 row-start-1 grid gap-x-6 gap-y-8 sm:grid-cols-2"
+              data-project-page={pageIndex}
+              data-active={pageIndex === 0 ? 'true' : 'false'}
+              aria-hidden={pageIndex === 0 ? 'false' : 'true'}
+            >
+              {page.map((entry) => (
+                <button
+                  type="button"
+                  class="reveal-card group text-left"
+                  data-reveal
+                  data-card-open
+                  data-card-title={entry.data.title}
+                  data-card-desc={entry.data.description}
+                  data-card-meta={entry.data.stack.join(' · ')}
+                  data-card-stars={
+                    entry.data.repo && stars?.[entry.data.repo] !== undefined
+                      ? String(stars[entry.data.repo])
+                      : ''
+                  }
+                  data-card-cover={entry.data.logo ? `/apps/${entry.data.logo}` : ''}
+                  data-card-cover-mode={entry.data.logo ? 'lockup' : 'none'}
+                  data-card-monogram={initials(entry.data.title)}
+                  data-card-repo={entry.data.repo ?? ''}
+                  data-card-site={entry.data.url ?? ''}
+                  aria-label={`${t.open} ${entry.data.title}`}
+                >
+                  {/* 3:2 rather than 4:3: the cover dominates the card's height, and
+                      the owner preferred the tighter card that left the deck column
+                      some air instead of filling it top to bottom. */}
+                  <div class="relative flex aspect-[3/2] items-center justify-center overflow-hidden border border-hairline bg-surface-1 transition-colors duration-200 group-hover:border-primary">
+                    {entry.data.logo ? (
+                      <>
+                        <img
+                          src={`/apps/${entry.data.logo}/lockup-dark.png`}
+                          alt={`${entry.data.title} logo`}
+                          loading="lazy"
+                          class="asset-dark w-3/5"
+                        />
+                        <img
+                          src={`/apps/${entry.data.logo}/lockup-light.png`}
+                          alt={`${entry.data.title} logo`}
+                          loading="lazy"
+                          class="asset-light w-3/5"
+                        />
+                      </>
+                    ) : (
+                      <span class="font-mono text-3xl tracking-[0.1em] text-ink-tertiary" aria-hidden="true">
+                        {initials(entry.data.title)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Stack chips take their accent from the active palette. */}
+                  <ul class="mt-4 flex flex-wrap gap-1.5">
+                    {entry.data.stack.map((tech) => (
+                      <li class="tag" style={`--tag-accent: ${tagHue(tech)}`}>
+                        {tech}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <h3 class="mt-3 text-lg font-medium text-ink transition-colors duration-200 group-hover:text-primary">
+                    {entry.data.title}
+                  </h3>
+                  <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-muted">
+                    {entry.data.description}
+                  </p>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-)}
+    </section>
+  )
+}

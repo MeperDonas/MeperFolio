@@ -1,0 +1,168 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  index: string;
+  title: string;
+  entries: CollectionEntry<'plugins'>[];
+  hidden?: boolean;
+}
+
+const { locale, index, title, entries, hidden } = Astro.props;
+
+/** Same pager as projects: four per page behind one static frame. */
+const PER_PAGE = 4;
+
+const pages: CollectionEntry<'plugins'>[][] = [];
+for (let i = 0; i < entries.length; i += PER_PAGE) {
+  pages.push(entries.slice(i, i + PER_PAGE));
+}
+
+const paged = pages.length > 1;
+const pad = (n: number) => String(n).padStart(2, '0');
+const initials = (value: string) =>
+  value
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join('')
+    .toUpperCase();
+
+const t =
+  locale === 'es'
+    ? {
+        prev: 'Plugins anteriores',
+        next: 'Plugins siguientes',
+        lead: 'Widgets de barra para Omarchy, publicados como plugins: cada uno resuelve una parte concreta de la jornada y se configura desde el propio panel.',
+        open: 'Ver detalle de',
+      }
+    : {
+        prev: 'Previous plugins',
+        next: 'Next plugins',
+        lead: 'Omarchy bar widgets published as plugins: each one solves a concrete part of the workday and is configured from its own panel.',
+        open: 'View details for',
+      };
+---
+
+{
+  entries.length > 0 && (
+    <section data-locale={locale} class="py-section" hidden={hidden || undefined}>
+      <div class="px-6">
+        <p class="section-eyebrow" data-reveal>
+          {index}
+        </p>
+        <h2 class="mt-4 text-display-md text-ink" data-reveal>
+          {title}
+        </h2>
+        <p class="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted" data-reveal>
+          {t.lead}
+        </p>
+
+        {paged && (
+          <div class="mt-10 flex items-center justify-between gap-4">
+            <button
+              type="button"
+              data-project-prev
+              aria-label={t.prev}
+              class="flex size-11 items-center justify-center border border-hairline-strong bg-surface-1 text-ink transition-colors duration-200 hover:border-primary hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-40"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-5">
+                <path d="M14.5 18.25L8.25 12L14.5 5.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" />
+              </svg>
+            </button>
+            <p
+              class="font-mono text-[11px] tracking-[0.08em] text-ink-tertiary tabular-nums"
+              data-project-counter
+            >
+              {pad(1)} / {pad(pages.length)}
+            </p>
+            <button
+              type="button"
+              data-project-next
+              aria-label={t.next}
+              class="flex size-11 items-center justify-center border border-hairline-strong bg-surface-1 text-ink transition-colors duration-200 hover:border-primary hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-40"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-5">
+                <path d="M9.5 18.25L15.75 12L9.5 5.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/*
+          Flat and wide rather than tall, as asked: the cover becomes a square on
+          the left and the content sits beside it. One row per plugin, still four
+          per page inside the same static frame as the project grid.
+        */}
+        <div class="mt-6 grid" data-project-pages>
+          {pages.map((page, pageIndex) => (
+            <div
+              class="project-page col-start-1 row-start-1 grid gap-4"
+              data-project-page={pageIndex}
+              data-active={pageIndex === 0 ? 'true' : 'false'}
+              aria-hidden={pageIndex === 0 ? 'false' : 'true'}
+            >
+              {page.map((entry) => (
+                <button
+                  type="button"
+                  class="reveal-card group flex items-stretch border border-hairline bg-canvas-deep text-left transition-colors duration-200 hover:border-primary"
+                  data-reveal
+                  data-card-open
+                  data-card-title={entry.data.title}
+                  data-card-desc={entry.data.description}
+                  data-card-meta={`v${entry.data.version} · ${entry.data.kind}`}
+                  data-card-cover={entry.data.preview ?? ''}
+                  data-card-cover-mode={entry.data.preview ? 'single' : 'none'}
+                  data-card-monogram={initials(entry.data.title)}
+                  data-card-repo={entry.data.url ?? entry.data.repo}
+                  data-card-site={entry.data.url ? entry.data.repo : ''}
+                  aria-label={`${t.open} ${entry.data.title}`}
+                >
+                  <div class="theme-grid relative flex w-28 shrink-0 items-center justify-center overflow-hidden border-r border-hairline bg-surface-1 sm:w-36">
+                    {entry.data.preview ? (
+                      <img
+                        src={entry.data.preview}
+                        alt=""
+                        loading="lazy"
+                        class="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span aria-hidden="true" class="font-mono text-2xl tracking-[0.08em] text-primary">
+                        {initials(entry.data.title)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div class="flex min-w-0 flex-1 flex-col p-4">
+                    <div class="flex items-start justify-between gap-3">
+                      <h3 class="text-lg font-medium text-ink transition-colors duration-200 group-hover:text-primary">
+                        {entry.data.title}
+                      </h3>
+                      <span class="tag shrink-0">v{entry.data.version}</span>
+                    </div>
+                    <p class="mt-1 truncate font-mono text-[11px] uppercase tracking-[0.08em] text-ink-tertiary">
+                      by @MeperDonas · {entry.data.kind}
+                      {entry.data.id ? ` · ${entry.data.id}` : ''}
+                    </p>
+                    <p class="mt-2.5 line-clamp-2 text-sm leading-relaxed text-ink-muted">
+                      {entry.data.description}
+                    </p>
+                    <div class="mt-auto flex items-center gap-2 pt-3">
+                      <span class="tag">{entry.data.kind}</span>
+                      <span class="font-mono text-[10px] uppercase tracking-[0.12em] text-primary">New</span>
+                      <span class="ml-auto font-mono text-[10px] uppercase tracking-[0.12em] text-ink-tertiary">
+                        MIT
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

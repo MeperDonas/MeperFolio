@@ -4,6 +4,7 @@ import {
   aboutSchema,
   experienceSchema,
   projectsSchema,
+  pluginsSchema,
   certificationsSchema,
   siteSchema,
 } from './content/schemas';
@@ -20,6 +21,10 @@ const projects = defineCollection({
   loader: glob({ base: './content/projects', pattern: '**/*.md' }),
   schema: projectsSchema,
 });
+const plugins = defineCollection({
+  loader: glob({ base: './content/plugins', pattern: '**/*.md' }),
+  schema: pluginsSchema,
+});
 const certifications = defineCollection({
   loader: glob({ base: './content/certifications', pattern: '**/*.md' }),
   schema: certificationsSchema,
@@ -29,4 +34,4 @@ const site = defineCollection({
   schema: siteSchema,
 });
 
-export const collections = { about, experience, projects, certifications, site };
+export const collections = { about, experience, projects, plugins, certifications, site };

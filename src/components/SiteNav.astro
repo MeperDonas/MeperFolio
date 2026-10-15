@@ -5,6 +5,7 @@ export interface NavLabels {
   about: string;
   experience: string;
   projects: string;
+  plugins: string;
   certifications: string;
 }
 
@@ -28,7 +29,16 @@ const { nav, items } = Astro.props;
   indicator position, the active state, and the smooth scroll-on-click.
 -->
 <nav data-split-nav class="split-nav mt-10 lg:mt-14" aria-label="Primary">
-  <ul class="flex items-center gap-6 overflow-x-auto pb-1 lg:block lg:gap-0 lg:overflow-visible lg:pb-0">
+  {/*
+    Below lg this row is horizontal, and it is centred to match the hero, which is
+    centred too. The scroller and the centring need separate elements: a centred flex
+    child inside an `overflow-x-auto` container clips its own left edge and cannot be
+    scrolled back to. So the wrapper scrolls and the list is centred with `w-max
+    mx-auto`, which centres while it fits and keeps its full width (and therefore
+    correct scrolling) once it does not. lg turns it back into the vertical list.
+  */}
+  <div class="overflow-x-auto pb-1 lg:overflow-visible lg:pb-0">
+    <ul class="mx-auto flex w-max items-center gap-6 lg:mx-0 lg:block lg:w-auto lg:gap-0">
     {
       items.map(({ id, key }, i) => (
         <li data-nav-item={id} class="shrink-0 lg:shrink">
@@ -46,6 +56,7 @@ const { nav, items } = Astro.props;
         </li>
       ))
     }
-  </ul>
+    </ul>
+  </div>
   <span data-nav-indicator class="split-nav-indicator hidden lg:block" aria-hidden="true"></span>
 </nav>
