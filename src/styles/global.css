@@ -1043,39 +1043,11 @@
   animation: cv-pop 0.2s var(--ease-out-expo);
 }
 
-/* The input reads as the panel's opening line, not a form field: sans, not the
-   mono used for headlines and controls, on a flat surface with a single hairline
-   that turns to the brand on focus. */
-.cmdk-input {
-  flex: none;
-  width: 100%;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--color-hairline);
-  padding: 17px 20px;
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
-  color: var(--color-ink);
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.cmdk-input:focus {
-  border-bottom-color: var(--color-primary);
-  background: var(--color-surface-2);
-}
-
-.cmdk-input::placeholder {
-  color: var(--color-ink-subtle);
-}
-
+/* The palette opens straight into its list: the rows are the panel's first line.
+   The extra top padding stands in for the space the search field used to occupy. */
 .cmdk-list {
   margin: 0;
-  padding: 8px;
+  padding: 12px 8px 8px;
   list-style: none;
   overflow-y: auto;
 }

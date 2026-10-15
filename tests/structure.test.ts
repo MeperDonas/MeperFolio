@@ -3,6 +3,7 @@ import projects from '../src/components/Projects.astro?raw';
 import plugins from '../src/components/Plugins.astro?raw';
 import siteNav from '../src/components/SiteNav.astro?raw';
 import index from '../src/pages/index.astro?raw';
+import appTs from '../src/scripts/app.ts?raw';
 import globalCss from '../src/styles/global.css?raw';
 import themesCss from '../src/styles/themes.css?raw';
 
@@ -60,6 +61,21 @@ describe('structural invariants', () => {
   it('centres the horizontal section nav instead of leaving it left-aligned', () => {
     // The nav row hugged the left while everything above it was centred.
     expect(siteNav).toMatch(/overflow-x-auto[\s\S]{0,200}mx-auto flex w-max/);
+  });
+
+  it('keeps the palette keyboard-driven with no text input', () => {
+    // A text field in the panel made the browser offer its password manager on
+    // every open, for a filter that seven fixed rows never needed. Removing it
+    // moves the arrow keys off the input, so the two halves are pinned together:
+    // no field in the markup, and the key handling bound to the palette itself.
+    const palette = index.slice(index.indexOf('data-cmdk hidden'));
+    expect(palette).not.toContain('<input');
+    expect(appTs).not.toContain('data-cmdk-input');
+    expect(appTs).not.toContain('applyFilter');
+    // The panel must be focusable, or nothing ever receives the arrows.
+    expect(palette).toMatch(/data-cmdk-panel[\s\S]{0,120}tabindex="-1"/);
+    expect(appTs).toMatch(/cmdkRoot\.addEventListener\('keydown'/);
+    expect(appTs).toContain('panel?.focus()');
   });
 
   it('keeps the card buttons the only modal trigger', () => {
