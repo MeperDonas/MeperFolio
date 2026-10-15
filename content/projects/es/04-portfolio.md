@@ -6,6 +6,6 @@ stack:
   - Tailwind CSS
   - TypeScript
 logo: meperfolio
-url: https://meperfolio.vercel.app/
+url: https://folio.mepersoft.app
 repo: https://github.com/MeperDonas/MeperFolio
 ---

@@ -6,6 +6,6 @@ stack:
   - TypeScript
   - Tailwind CSS
 logo: meperboard
-url: https://github.com/MeperDonas/MeperBoard
+url: https://board.mepersoft.app
 repo: https://github.com/MeperDonas/MeperBoard
 ---

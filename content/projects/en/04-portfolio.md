@@ -5,7 +5,7 @@ stack:
   - Astro
   - Tailwind CSS
   - TypeScript
-url: https://github.com/MeperDonas/MeperFolio
+url: https://folio.mepersoft.app
 logo: meperfolio
 repo: https://github.com/MeperDonas/MeperFolio
 ---
