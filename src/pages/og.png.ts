@@ -97,7 +97,7 @@ function ogTree(name: string, role: string, head: string, body: string): TreeNod
                     color: T.inkSubtle,
                     fontSize: '21px',
                   },
-                  children: 'meperfolio.vercel.app',
+                  children: 'folio.mepersoft.app',
                 },
               },
             ],

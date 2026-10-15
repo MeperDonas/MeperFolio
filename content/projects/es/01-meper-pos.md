@@ -8,6 +8,6 @@ stack:
   - Prisma
   - TypeScript
 logo: meperpos
-url: https://github.com/MeperDonas/gestion-inventario-app
+url: https://pos.mepersoft.app
 repo: https://github.com/MeperDonas/MeperPOS
 ---
