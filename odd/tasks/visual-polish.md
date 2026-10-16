@@ -46,8 +46,9 @@ S10 — Look'n'Feel is the first plugin and carries the mascot art the owner sen
 Quote: "dejame look'n'feel de primer plugin y cambile el icono por este: [Image 5]"
 Acceptance: the plugins list opens with `Look'n'Feel`, then `devstack`, then `Work connection` (both locales, by content filename order), and its cover is the sent art — the Siamese on terracotta, shipped as `/plugins/looknfeel.webp`, an 88% centred crop of the file's rounded tile so no surround colour reaches the corners.
 
-S11 — BLOCKED, waiting on the owner. Quote: "el logo de meperboard, cambia esa imagen por esta [Image 3] dejala como esta la actual, en plan cortada y tal, pero es que la que esta actualmente esta diferente a la original."
-The evidence contradicts the instruction as written, so nothing is changed until the owner answers: the art sent (black cat on gold) is `Luna`, the BrokerApp mascot, in the brand pack, in the pack's showcase and in the v2 pack; the site's MeperBoard card carries `Mochi` (black and white cat on blue), which is exactly what `MeperBoard -> Mochi` in both `README.txt` files and the MeperBoard app's own `src/app/icon.png` show. Question asked in the report: does MeperBoard adopt that art, or does the owner have a different MeperBoard original to point at?
+S11 — BrokerApp's cover carries the sent Luna art with the whole head, not the clipped crop. Corrected by the owner after S11's first version (which guessed MeperBoard): "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie".
+Reading: the sources agree that the black cat on gold is `Luna` and that it belongs to BrokerApp; the site already carried that mascot, but as an 80% centred crop of its tile, which is the one card whose ear tips the crop clips (every other project icon matches an 80% crop with its head intact). Acceptance: `public/apps/brokerapp/icon.webp` is rebuilt from the Luna tile at the gentlest crop that clears the tile's rounded corners (86%, measured corner inset 8.69%), its transparent corners flattened onto the tile's own gold (sampled `srgb(246,205,139)`), opaque, 512x512, and the rendered card shows the whole head.
+Status: done this round.
 
 S12 — Nothing else in the round's list. Items 4 and 5 of the previous round (the plugin card, the marketplace redirect) are already delivered.
 
@@ -68,8 +69,9 @@ T12 (S7) CV: `#pagemode=none&navpanes=0&view=FitH` on both iframes, the tripwire
 T13 (S9) Browser identity: `public/favicon.ico`, `public/icons/MeperFolio/` (16/32/180/192/512), `public/site.webmanifest`, and the head links in `Base.astro` — inline — done. All four advertised paths answer 200 with the right content type over http.
 T14 (S10) Plugins: `00-looknfeel.md` first, `02-devstack.md`, `03-work-vpn.md`, and a new `public/plugins/looknfeel.webp` (88% centred crop of the tile) — inline — done. Rendered order: Look'n'Feel, devstack, Work connection.
 T15 (S6) Cluster: `bottom-14` (56px) below lg, tripwire and rendered assertion updated — inline — done. Measured at 390x844: right 24, bottom 56.
-T16 (S11) MeperBoard art — BLOCKED, no write made. See S11: the sent art is BrokerApp's mascot and the site already carries MeperBoard's own.
+T16 (S11) MeperBoard art — dropped: the owner corrected the card (it is BrokerApp). No write was made to MeperBoard.
 T17 (S1/S6/S9/S10) Test updates: art share floor raised to 0.85, mobile cluster gap 56, plugin order assertion, favicon/manifest head tripwires, browser-identity asset integrity — inline — done. Suite 69/69.
+T18 (S11) BrokerApp cover rebuilt from the Luna tile: 86% centred crop (the tile's rounded-corner inset measures 8.69%, so 86% is the gentlest crop that clears it), transparent corners flattened onto the tile's own gold, 512x512 opaque webp — inline — done. Every other project icon matches an 80% crop with the head intact; BrokerApp was the one whose crop clipped the ear tips.
 
 ## Log
 
@@ -119,4 +121,13 @@ L14 — Item 2 in that list is blocked and nothing was written for it. Evidence:
 L15 — Verification of this round: suite 69/69 (from 66), `astro check` 0 errors, build exit 0, and a puppeteer pass over the built site confirming the 0.909 art share, the plugin order, the closed CV panel and the 56px cluster gap, plus 200s for every browser-identity path. Code and tests land in `f377d5c`.
 
 L16 — Open with the owner: S11 (which art belongs to MeperBoard), and confirmation that 56px is the cluster the owner had in mind. Pushing the branch and opening the PR remain the owner's decisions.
+
+L17 (verbatim, owner — third message):
+> NO, quiero que le cambias el el gato al propio brokerapp por la luna que te envie
+> [Image 1]  no le cmbiaste el logo a looknfeel [Image 2]
+
+L18 — Both halves of that message resolve to the same cause, and it is not the code. "no le cambiaste el logo a looknfeel" is what the deployed site shows: the owner pushed round 1 straight to `main` (`50310ad`), and round 2 — with the Siamese cover — is still local and unpushed, so the running site renders round 1's tabby cover. The plugins section in that screenshot also still shows the old card order. Nothing to fix in the files; the branch has to reach the remote for the owner to see it.
+
+L19 — S11 rewritten after the owner's correction: the card was BrokerApp, not MeperBoard. Measurement that explains the complaint: every project icon in `public/apps/` matches an 80% centred crop of its brand-pack tile (RMSE 0.082-0.144 against candidate crops), and the BrokerApp tile is the only one whose cat has its ear tips inside that outer 10%, so it was the one cover rendering a clipped head. Rebuilt at 86% with the corners flattened onto the tile's own gold: the whole head, no clipping, no seams.
+
 
