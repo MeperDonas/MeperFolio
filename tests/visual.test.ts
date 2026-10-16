@@ -176,6 +176,111 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
   );
 
   it(
+    'keeps every project card the same size, with a large undistorted cover',
+    async () => {
+      const page = await openSite();
+      await page.evaluate(() => document.getElementById('projects')?.scrollIntoView());
+      // One, not both: the other locale's copy sits in the DOM behind `hidden`,
+      // has no layout and never loads its lazy covers. `[data-locale="es"]` is the
+      // copy on screen by default.
+      // Scoped to `#projects` on purpose: the plugins section uses the same
+      // `data-project-page` pager, so an unscoped selector mixes both sections.
+      const cardsIn = '#projects [data-locale="es"] [data-project-page="0"] [data-card-open]';
+      // The reveal choreography scales cards down until they enter view, and the
+      // second row never enters the observed viewport inside the snap deck, so
+      // the test reveals them itself and then measures the resting geometry.
+      await page.evaluate((selector) => {
+        for (const card of document.querySelectorAll(selector)) {
+          card.classList.add('is-visible');
+        }
+      }, cardsIn);
+      await page.waitForFunction(
+        (selector) => {
+          const cards = Array.from(document.querySelectorAll(selector));
+          return (
+            cards.length === 4 &&
+            cards.every((card) => {
+              const img = card.querySelector('img');
+              return (
+                !!img &&
+                img.complete &&
+                img.naturalWidth > 0 &&
+                getComputedStyle(card).transform === 'none'
+              );
+            })
+          );
+        },
+        { timeout: 20_000 },
+        cardsIn,
+      );
+
+      const cards = await page.$$eval(
+        '#projects [data-locale="es"] [data-project-page="0"] [data-card-open]',
+        (nodes) =>
+          nodes.map((node) => {
+            const card = node.getBoundingClientRect();
+            const cover = node.querySelector(':scope > div')!.getBoundingClientRect();
+            const img = node.querySelector('img');
+            const art = img?.getBoundingClientRect();
+            return {
+              title: (node as HTMLElement).dataset.cardTitle ?? '',
+              height: card.height,
+              cover: { top: cover.top, height: cover.height, width: cover.width },
+              art: art
+                ? {
+                    height: art.height,
+                    width: art.width,
+                    left: art.left - cover.left,
+                    right: cover.right - art.right,
+                    top: art.top - cover.top,
+                    bottom: cover.bottom - art.bottom,
+                  }
+                : null,
+              natural: img ? { width: img.naturalWidth, height: img.naturalHeight } : null,
+            };
+          }),
+      );
+
+      // BrokerApp took VidMetrics Pulse's slot on the first page.
+      expect(cards.map((card) => card.title)).toEqual([
+        'MeperSoft',
+        'Meper-Pos',
+        'MeperBoard',
+        'BrokerApp',
+      ]);
+
+      const span = (values: number[]) => Math.max(...values) - Math.min(...values);
+      // A one-row chip stack or a short description used to shorten its card and
+      // leave the row ragged, so the whole page is checked, not just one row.
+      expect(span(cards.map((card) => card.height)), 'every card must be the same height').toBeLessThanOrEqual(1);
+      for (const row of [
+        [cards[0], cards[1]],
+        [cards[2], cards[3]],
+      ]) {
+        expect(span(row.map((card) => card.cover.height))).toBeLessThanOrEqual(1);
+        expect(span(row.map((card) => card.cover.top))).toBeLessThanOrEqual(1);
+      }
+
+      for (const card of cards) {
+        expect(card.art, `${card.title} must render its cover art`).not.toBeNull();
+        if (!card.art || !card.natural) continue;
+        // "se pierde en el centro": the tile used to be 58% of the box height.
+        const share = card.art.height / card.cover.height;
+        expect(share, `${card.title} cover art is too small`).toBeGreaterThanOrEqual(0.7);
+        // Never stretched: the rendered ratio has to match the file's own.
+        const rendered = card.art.width / card.art.height;
+        const file = card.natural.width / card.natural.height;
+        expect(Math.abs(rendered - file), `${card.title} cover art is distorted`).toBeLessThan(0.02);
+        expect(Math.abs(card.art.left - card.art.right), `${card.title} art is off-centre`).toBeLessThanOrEqual(1);
+        expect(Math.abs(card.art.top - card.art.bottom), `${card.title} art is off-centre`).toBeLessThanOrEqual(1);
+      }
+
+      await page.close();
+    },
+    TEST_TIMEOUT,
+  );
+
+  it(
     'renders every loaded project cover opaque, corners included',
     async () => {
       const page = await openSite();
@@ -311,6 +416,16 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
       expect(box.bottom).toBeLessThanOrEqual(MOBILE.height + 1);
       expect(box.left).toBeGreaterThanOrEqual(0);
       expect(box.right).toBeLessThanOrEqual(MOBILE.width + 1);
+
+      // The cluster sits on the reading column's gutter, lifted off the floor:
+      // at 16px it read as jammed into the viewport corner.
+      const cluster = await page.$eval('[data-cmdk-open]', (el) => {
+        const rect = el.parentElement!.getBoundingClientRect();
+        return { right: rect.right, bottom: rect.bottom };
+      });
+      expect(Math.round(MOBILE.width - cluster.right), 'cluster right offset').toBe(24);
+      expect(Math.round(MOBILE.height - cluster.bottom), 'cluster bottom offset').toBe(24);
+
       await page.close();
     },
     TEST_TIMEOUT,

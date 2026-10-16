@@ -626,6 +626,9 @@ if (cardModal) {
   const stackEl = cardModal.querySelector<HTMLElement>('[data-card-modal-stack]');
   const repoLink = cardModal.querySelector<HTMLAnchorElement>('[data-card-modal-repo]');
   const siteLink = cardModal.querySelector<HTMLAnchorElement>('[data-card-modal-site]');
+  const marketplaceLink = cardModal.querySelector<HTMLAnchorElement>(
+    '[data-card-modal-marketplace]',
+  );
   const starsEl = cardModal.querySelector<HTMLElement>('[data-card-modal-stars]');
   const starsCountEl = cardModal.querySelector<HTMLElement>('[data-card-modal-stars-count]');
   const focusables = (): HTMLElement[] =>
@@ -680,6 +683,14 @@ if (cardModal) {
     if (siteLink) {
       siteLink.hidden = !site;
       if (site) siteLink.href = site;
+    }
+
+    // Plugin cards carry the page of the Omarchy Plugin Marketplace where the
+    // plugin is published; project cards leave it empty and the action is gone.
+    const marketplace = card.dataset.cardMarketplace ?? '';
+    if (marketplaceLink) {
+      marketplaceLink.hidden = !marketplace;
+      if (marketplace) marketplaceLink.href = marketplace;
     }
 
     // Star count is build-time data; absent when the repo is missing, private

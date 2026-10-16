@@ -79,6 +79,22 @@ describe('content assets', () => {
     expect(bad).toEqual([]);
   });
 
+  it('points every plugin at its own page in the omarchy marketplace', () => {
+    // The owner hit the dead-link class twice. The marketplace's per-plugin
+    // page is `plugin.html?id=<manifest id>`, so the entry's own id has to
+    // appear in its own redirect; a mismatched id is a 404 in production.
+    const bad: string[] = [];
+    for (const [path, fm] of entries(pluginFiles)) {
+      if (!fm.id) {
+        bad.push(`${path}: no manifest id`);
+        continue;
+      }
+      const wanted = `https://plugins.omarchy.org/plugin.html?id=${fm.id}`;
+      if (fm.marketplace !== wanted) bad.push(`${path}: ${fm.marketplace ?? 'no marketplace url'}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
   it('gives every entry a title and a description', () => {
     const bad: string[] = [];
     for (const [path, fm] of [...entries(projectFiles), ...entries(pluginFiles)]) {

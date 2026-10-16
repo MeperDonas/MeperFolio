@@ -116,8 +116,9 @@ const t =
                   data-card-cover={entry.data.preview ?? ''}
                   data-card-cover-mode={entry.data.preview ? 'single' : 'none'}
                   data-card-monogram={initials(entry.data.title)}
-                  data-card-repo={entry.data.url ?? entry.data.repo}
-                  data-card-site={entry.data.url ? entry.data.repo : ''}
+                  data-card-repo={entry.data.repo}
+                  data-card-site={entry.data.url ?? ''}
+                  data-card-marketplace={entry.data.marketplace ?? ''}
                   aria-label={`${t.open} ${entry.data.title}`}
                 >
                   <div class="theme-grid relative flex w-28 shrink-0 items-center justify-center overflow-hidden border-r border-hairline bg-surface-1 sm:w-36">

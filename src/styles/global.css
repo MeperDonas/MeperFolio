@@ -540,8 +540,11 @@
   transform: none;
 }
 
-/* Cards enter with a slight scale so grid batches read as a wave. */
-.js [data-reveal].reveal-card {
+/* Cards enter with a slight scale so grid batches read as a wave. Gated on
+   `:not(.is-visible)`: at equal specificity the later rule would otherwise win
+   over `.is-visible`'s `transform: none` and freeze every card mid-entrance —
+   permanently 3% smaller and 38px lower than the grid it lives in. */
+.js [data-reveal].reveal-card:not(.is-visible) {
   transform: translateY(38px) scale(0.97);
 }
 

@@ -41,7 +41,9 @@ export const projectsSchema = z.object({
 
 /**
  * An Omarchy plugin (bar widget). `repo` is required because publishing is the
- * point of this section; `url` stays optional for a future marketplace page.
+ * point of this section; `url` is the plugin's own live site when it has one,
+ * and `marketplace` its page in the Omarchy Plugin Marketplace, which every
+ * card offers as the redirect to the registry where the plugin is published.
  */
 export const pluginsSchema = z.object({
   title: z.string(),
@@ -50,6 +52,7 @@ export const pluginsSchema = z.object({
   kind: z.string(),
   repo: z.string().url(),
   url: optionalUrl,
+  marketplace: optionalUrl,
   /** Screenshot shown as the card cover, as in the Omarchy plugin registry. */
   preview: z.string().optional(),
   /** The plugin's own `manifest.json` id, shown as the registry reference. */

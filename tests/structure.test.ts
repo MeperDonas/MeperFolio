@@ -52,8 +52,10 @@ describe('structural invariants', () => {
 
   it('keeps the control cluster reachable while scrolling', () => {
     // Absolute positioning scrolled the theme switch and the back-to-top away
-    // with the page, which is exactly when you need them.
-    expect(index).toMatch(/fixed[^"]*bottom-4 right-4/);
+    // with the page, which is exactly when you need them. Below lg the offsets
+    // are the content gutter (24px), not the viewport corner: at 16px the
+    // cluster read as jammed into the corner instead of floating over the edge.
+    expect(index).toMatch(/fixed[^"]*bottom-6 right-6/);
     expect(index).toContain('data-theme-toggle');
     expect(index).toContain('data-scroll-top');
   });
@@ -83,7 +85,7 @@ describe('structural invariants', () => {
     // identity column, which left two control groups on the same band. They belong
     // to the cluster at the top-right of <main>, which is also the only one that
     // escapes the column's overflow clipping.
-    const from = index.indexOf('bottom-4 right-4');
+    const from = index.indexOf('bottom-6 right-6');
     const to = index.indexOf('data-theme-menu');
     expect(from, 'the cluster must exist').toBeGreaterThan(0);
     expect(to, 'the theme menu must exist').toBeGreaterThan(from);
@@ -103,6 +105,34 @@ describe('structural invariants', () => {
     // nest an interactive element inside a card button.
     expect(projects).toContain('data-card-open');
     expect(projects).not.toMatch(/data-card-open[\s\S]{0,600}<a\s/);
+  });
+
+  it('reserves the room every project card needs to be the same height', () => {
+    // The measured version of this lives in visual.test.ts. These are the cheap
+    // tripwires: a full-height column, a two-row chip gutter, a one-line title
+    // and a two-line description floor. Drop one and the grid goes ragged again
+    // with nothing in the build log to show it.
+    expect(projects).toContain('flex h-full flex-col');
+    expect(projects).toContain('min-h-[60px]');
+    expect(projects).toContain('line-clamp-1');
+    expect(projects).toContain('min-h-[46px]');
+  });
+
+  it('keeps a marketplace redirect on the plugin cards', () => {
+    // Every plugin is published in the Omarchy Plugin Marketplace, so the card's
+    // modal carries the redirect: the payload from the card, the action in the
+    // modal, and the wiring that fills its href. assets.test.ts pins the URL
+    // format against each entry's own manifest id.
+    expect(plugins).toContain('data-card-marketplace');
+    expect(index).toContain('data-card-modal-marketplace');
+    expect(appTs).toContain('cardMarketplace');
+  });
+
+  it('opens the CV preview with the pages panel', () => {
+    // The viewer's own panel is the fastest way to jump around a CV; it used to
+    // be closed by the fragment (`navpanes=0`), so the reader always had to open
+    // it by hand. One iframe per locale, both pinned.
+    expect(index.match(/#pagemode=thumbs&navpanes=1/g)?.length).toBe(2);
   });
 });
 

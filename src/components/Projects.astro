@@ -101,7 +101,7 @@ const t =
               {page.map((entry) => (
                 <button
                   type="button"
-                  class="reveal-card group text-left"
+                  class="reveal-card group flex h-full flex-col text-left"
                   data-reveal
                   data-card-open
                   data-card-title={entry.data.title}
@@ -131,7 +131,7 @@ const t =
                         src={`/apps/${entry.data.logo}/icon.webp`}
                         alt={`${entry.data.title} logo`}
                         loading="lazy"
-                        class="h-[58%] w-auto"
+                        class="h-[76%] w-auto max-w-[76%] object-contain"
                       />
                     ) : (
                       <span class="font-mono text-3xl tracking-[0.1em] text-ink-tertiary" aria-hidden="true">
@@ -140,8 +140,10 @@ const t =
                     )}
                   </div>
 
-                  {/* Stack chips take their accent from the active palette. */}
-                  <ul class="mt-4 flex flex-wrap gap-1.5">
+                  {/* Stack chips take their accent from the active palette. The
+                      gutter reserves two rows so a card with one row of chips is
+                      not shorter than the card beside it. */}
+                  <ul class="mt-4 flex min-h-[60px] flex-wrap content-start gap-1.5">
                     {entry.data.stack.map((tech) => (
                       <li class="tag" style={`--tag-accent: ${tagHue(tech)}`}>
                         {tech}
@@ -149,10 +151,10 @@ const t =
                     ))}
                   </ul>
 
-                  <h3 class="mt-3 text-lg font-medium text-ink transition-colors duration-200 group-hover:text-primary">
+                  <h3 class="mt-3 line-clamp-1 text-lg font-medium text-ink transition-colors duration-200 group-hover:text-primary">
                     {entry.data.title}
                   </h3>
-                  <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-muted">
+                  <p class="mt-2 line-clamp-2 min-h-[46px] text-sm leading-relaxed text-ink-muted">
                     {entry.data.description}
                   </p>
                 </button>
