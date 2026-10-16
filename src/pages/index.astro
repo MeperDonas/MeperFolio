@@ -149,8 +149,15 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
       and outside the deck, which scrolls internally - so the palette panel can
       never be cut off no matter how tall it grows, and the controls stay
       reachable while the page scrolls.
+
+      Below lg it is a column anchored to the bottom-right: at 390px the four
+      controls in a row ate most of the reading width, so on the narrow layout
+      they stack upward instead, in the same order read top to bottom. lg
+      restores the single row at the top-right, where there is width to spare.
     -->
-    <div class="fixed bottom-14 right-6 z-30 flex items-center gap-2 lg:bottom-auto lg:right-6 lg:top-6">
+    <div
+      class="fixed bottom-14 right-6 z-30 flex flex-col items-end gap-2 lg:bottom-auto lg:right-6 lg:top-6 lg:flex-row lg:items-center"
+    >
       <button
         type="button"
         data-cmdk-open

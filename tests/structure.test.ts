@@ -60,6 +60,9 @@ describe('structural invariants', () => {
     expect(index).toMatch(/fixed[^"]*bottom-14 right-6/);
     expect(index).toContain('data-theme-toggle');
     expect(index).toContain('data-scroll-top');
+    // One column on the narrow layout, one row on lg: in a row the four controls
+    // ate most of a 390px reading width.
+    expect(index).toMatch(/fixed[^"]*flex-col[^"]*lg:flex-row/);
   });
 
   it('centres the horizontal section nav instead of leaving it left-aligned', () => {

@@ -46,9 +46,13 @@ S10 — Look'n'Feel is the first plugin and carries the mascot art the owner sen
 Quote: "dejame look'n'feel de primer plugin y cambile el icono por este: [Image 5]"
 Acceptance: the plugins list opens with `Look'n'Feel`, then `devstack`, then `Work connection` (both locales, by content filename order), and its cover is the sent art — the Siamese on terracotta, shipped as `/plugins/looknfeel.webp`, an 88% centred crop of the file's rounded tile so no surround colour reaches the corners.
 
-S11 — BrokerApp's cover carries the sent Luna art with the whole head, not the clipped crop. Corrected by the owner after S11's first version (which guessed MeperBoard): "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie".
-Reading: the sources agree that the black cat on gold is `Luna` and that it belongs to BrokerApp; the site already carried that mascot, but as an 80% centred crop of its tile, which is the one card whose ear tips the crop clips (every other project icon matches an 80% crop with its head intact). Acceptance: `public/apps/brokerapp/icon.webp` is rebuilt from the Luna tile at the gentlest crop that clears the tile's rounded corners (86%, measured corner inset 8.69%), its transparent corners flattened onto the tile's own gold (sampled `srgb(246,205,139)`), opaque, 512x512, and the rendered card shows the whole head.
-Status: done this round.
+S11 — BrokerApp's cover carries the sent Luna art, whole head and no zoom. Corrected twice by the owner: first "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie", then a side-by-side: "la del sitio [Image 1] ... la que tienes que usar [Image 2]".
+Reading, settled by the second round's comparison: the mascot was never wrong — the framing was. The site's icons are 80% centred crops of their brand-pack tiles, and Luna's tile is the only one whose ear tips fall inside that outer 10%, so it was the single card rendering a clipped head; an 86% crop still zoomed too far. Acceptance: `public/apps/brokerapp/icon.webp` is the whole tile — trimmed, not cropped — with the rounded tile's transparent corners flood-filled and flattened onto the tile's own gold (`srgb(246,205,139)`), opaque, square 512x512, so the card shows the head with its margins exactly as the art does.
+Status: done. History: 80% crop (round 1) -> 86% crop -> the whole tile.
+
+S13 — Below `lg` the control cluster stacks vertically.
+Quote: "sigo esperando que estas opciones en responsive mobile se ajusten en vertical y no en horizontal", with a crop of the four controls sitting in a row across the narrow viewport.
+Acceptance: below `lg` the cluster is a column (`flex-col`, items right-aligned) anchored to the bottom-right at 24px/56px; at `lg` it returns to a single row at the top-right. Measured at 390x844: the four controls share one centre line (spread <= 1px) and stack downward in DOM order, and the cluster is no longer wider than a single control. This also explains the earlier "hacia arriba" phrasing: the stack grows upward from the bottom anchor.
 
 S12 — Nothing else in the round's list. Items 4 and 5 of the previous round (the plugin card, the marketplace redirect) are already delivered.
 
@@ -71,7 +75,9 @@ T14 (S10) Plugins: `00-looknfeel.md` first, `02-devstack.md`, `03-work-vpn.md`, 
 T15 (S6) Cluster: `bottom-14` (56px) below lg, tripwire and rendered assertion updated — inline — done. Measured at 390x844: right 24, bottom 56.
 T16 (S11) MeperBoard art — dropped: the owner corrected the card (it is BrokerApp). No write was made to MeperBoard.
 T17 (S1/S6/S9/S10) Test updates: art share floor raised to 0.85, mobile cluster gap 56, plugin order assertion, favicon/manifest head tripwires, browser-identity asset integrity — inline — done. Suite 69/69.
-T18 (S11) BrokerApp cover rebuilt from the Luna tile: 86% centred crop (the tile's rounded-corner inset measures 8.69%, so 86% is the gentlest crop that clears it), transparent corners flattened onto the tile's own gold, 512x512 opaque webp — inline — done. Every other project icon matches an 80% crop with the head intact; BrokerApp was the one whose crop clipped the ear tips.
+T18 (S11) BrokerApp cover rebuilt from the Luna tile: 86% centred crop (the tile's rounded-corner inset measures 8.69%), transparent corners flattened onto the tile's own gold, 512x512 opaque webp — inline — superseded by T19.
+T19 (S11) BrokerApp cover rebuilt again, this time from the whole tile: `-trim` (no crop), the four transparent corner regions flood-filled and the anti-aliased edge flattened onto `srgb(246,205,139)`, forced to a square 512x512 — inline — done. The card now renders the head with the margins the art itself has. Rejected on the way: a blurred-zooomed backdrop (pulled the dark fur into the corners) and an RGB dilation (smeared the whole art).
+T20 (S13) Cluster: `flex-col items-end` below `lg`, `lg:flex-row lg:items-center` above it, plus the comment, the structural regex and the rendered column assertions — inline — done. Measured at 390x844: centres within 1px, tops strictly increasing, cluster 24px/56px off the edges.
 
 ## Log
 
@@ -131,5 +137,16 @@ L18 — Both halves of that message resolve to the same cause, and it is not the
 L19 — S11 rewritten after the owner's correction: the card was BrokerApp, not MeperBoard. Measurement that explains the complaint: every project icon in `public/apps/` matches an 80% centred crop of its brand-pack tile (RMSE 0.082-0.144 against candidate crops), and the BrokerApp tile is the only one whose cat has its ear tips inside that outer 10%, so it was the one cover rendering a clipped head. Rebuilt at 86% with the corners flattened onto the tile's own gold: the whole head, no clipping, no seams.
 
 L20 — Delivered: `fix/visual-polish` pushed and PR #15 opened (label `enhancement`, +160/-26 across 22 files, three commits). Review, merge and therefore what reaches `folio.mepersoft.app` stay the owner's decisions; `main` still carries round 1 until the PR is merged.
+
+L21 (verbatim, owner — fourth message):
+> COmpara las fotos y tu me diras que esta mal; la del sitio: [Image 1]  la que tienes que usar: [Image 2]
+> sigo esperando que estas opciones en responsive mobile se ajusten en vertical y no en horizontal [Image 3]
+
+L22 — The frame comparison is the useful part: the site's cover clipped the ears (Image 1) while the art has the whole head with margins (Image 2). So the framing, not the mascot, was the defect, and "dejala como está la actual, en plan cortada y tal" from the earlier round meant keep the *square* treatment (no tile corners showing), not keep the zoom. Shipped the whole tile with the corners filled: the head is now smaller than its siblings' because their arts differ, which is what "the art I sent" means.
+
+L23 — S13 also retro-explains S6: the owner's "quede mejor sobre el borde hacia arriba" was about the controls stacking upward in a column, which the 56px lift alone could not deliver. Both are in place now: column below `lg`, single row at `lg`.
+
+L24 — Verification for this round: suite 69/69, `astro check` 0 errors, build exit 0; rendered pass confirming the 24px/56px anchors, the shared centre line and the strictly increasing tops of the four controls, and the BrokerApp cover rendering 512x512 opaque with the gold corners.
+
 
 

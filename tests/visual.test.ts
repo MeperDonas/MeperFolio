@@ -442,6 +442,25 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
       expect(Math.round(MOBILE.width - cluster.right), 'cluster right offset').toBe(24);
       expect(Math.round(MOBILE.height - cluster.bottom), 'cluster bottom offset').toBe(56);
 
+      // And it is a column, not a row: the four controls share one centre line and
+      // stack downward, in DOM order. In a row they consumed most of the width.
+      const stack = await page.evaluate(() =>
+        ['[data-cmdk-open]', '[data-locale-toggle]', '[data-scroll-top]', '[data-theme-toggle]'].map(
+          (selector) => {
+            const rect = document.querySelector(selector)!.getBoundingClientRect();
+            return { centre: rect.left + rect.width / 2, top: Math.round(rect.top) };
+          },
+        ),
+      );
+      const centres = stack.map((item) => item.centre);
+      expect(
+        Math.max(...centres) - Math.min(...centres),
+        'the controls must share one column',
+      ).toBeLessThanOrEqual(1);
+      for (let i = 1; i < stack.length; i += 1) {
+        expect(stack[i].top, `${i} stacks below ${i - 1}`).toBeGreaterThan(stack[i - 1].top);
+      }
+
       await page.close();
     },
     TEST_TIMEOUT,
