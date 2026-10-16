@@ -64,6 +64,17 @@ const siteUrl = 'https://folio.mepersoft.app';
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Browser identity, taken from the brand pack's MeperFolio folder as it
+      ships: favicon.ico at the root (where a browser looks by default), the
+      sized PNGs under /icons/MeperFolio/ (the paths the pack's own manifest
+      declares, so a future re-copy stays drop-in), and apple-touch-icon for
+      the iOS home screen.
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/icons/MeperFolio/icon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/icons/MeperFolio/icon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     <!-- tokyo-night canvas; scripts/app.ts re-syncs this to the live --t-bg. -->
     <meta name="theme-color" content="#1a1b26" />

@@ -3,6 +3,7 @@ import projects from '../src/components/Projects.astro?raw';
 import plugins from '../src/components/Plugins.astro?raw';
 import siteNav from '../src/components/SiteNav.astro?raw';
 import index from '../src/pages/index.astro?raw';
+import base from '../src/layouts/Base.astro?raw';
 import appTs from '../src/scripts/app.ts?raw';
 import globalCss from '../src/styles/global.css?raw';
 import themesCss from '../src/styles/themes.css?raw';
@@ -53,9 +54,10 @@ describe('structural invariants', () => {
   it('keeps the control cluster reachable while scrolling', () => {
     // Absolute positioning scrolled the theme switch and the back-to-top away
     // with the page, which is exactly when you need them. Below lg the offsets
-    // are the content gutter (24px), not the viewport corner: at 16px the
-    // cluster read as jammed into the corner instead of floating over the edge.
-    expect(index).toMatch(/fixed[^"]*bottom-6 right-6/);
+    // are the content gutter (24px) and a clear lift off the viewport floor
+    // (56px): at 16px the cluster read as jammed into the corner, and at 24px it
+    // still hugged the bottom edge instead of sitting clear above it.
+    expect(index).toMatch(/fixed[^"]*bottom-14 right-6/);
     expect(index).toContain('data-theme-toggle');
     expect(index).toContain('data-scroll-top');
   });
@@ -85,7 +87,7 @@ describe('structural invariants', () => {
     // identity column, which left two control groups on the same band. They belong
     // to the cluster at the top-right of <main>, which is also the only one that
     // escapes the column's overflow clipping.
-    const from = index.indexOf('bottom-6 right-6');
+    const from = index.indexOf('bottom-14 right-6');
     const to = index.indexOf('data-theme-menu');
     expect(from, 'the cluster must exist').toBeGreaterThan(0);
     expect(to, 'the theme menu must exist').toBeGreaterThan(from);
@@ -128,11 +130,22 @@ describe('structural invariants', () => {
     expect(appTs).toContain('cardMarketplace');
   });
 
-  it('opens the CV preview with the pages panel', () => {
-    // The viewer's own panel is the fastest way to jump around a CV; it used to
-    // be closed by the fragment (`navpanes=0`), so the reader always had to open
-    // it by hand. One iframe per locale, both pinned.
-    expect(index.match(/#pagemode=thumbs&navpanes=1/g)?.length).toBe(2);
+  it('opens the CV preview without the pages panel', () => {
+    // The panel is the viewer's own sidebar: it narrows the page and the owner
+    // wants the page itself to open, with the panel out of the way. `pagemode`
+    // was read the wrong way round once ("oculto" came through as "culto"), so
+    // both halves are pinned: no thumbs mode, and navpanes off.
+    expect(index.match(/#pagemode=none&navpanes=0/g)?.length).toBe(2);
+    expect(index).not.toContain('#pagemode=thumbs');
+  });
+
+  it('advertises the browser identity assets in the head', () => {
+    // The tab showed a blank globe because nothing in the head pointed at the
+    // brand pack's MeperFolio icons; a missing favicon is invisible in a build.
+    expect(base).toContain('rel="icon" href="/favicon.ico"');
+    expect(base).toContain('/icons/MeperFolio/icon-32.png');
+    expect(base).toContain('rel="apple-touch-icon"');
+    expect(base).toContain('rel="manifest" href="/site.webmanifest"');
   });
 });
 
