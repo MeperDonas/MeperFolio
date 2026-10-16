@@ -264,9 +264,10 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
       for (const card of cards) {
         expect(card.art, `${card.title} must render its cover art`).not.toBeNull();
         if (!card.art || !card.natural) continue;
-        // "se pierde en el centro": the tile used to be 58% of the box height.
+        // "se pierde en el centro": the tile used to be 58% of the box height,
+        // then 76%; the owner asked for more both times, so this pins 92%.
         const share = card.art.height / card.cover.height;
-        expect(share, `${card.title} cover art is too small`).toBeGreaterThanOrEqual(0.7);
+        expect(share, `${card.title} cover art is too small`).toBeGreaterThanOrEqual(0.85);
         // Never stretched: the rendered ratio has to match the file's own.
         const rendered = card.art.width / card.art.height;
         const file = card.natural.width / card.natural.height;
@@ -275,6 +276,20 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
         expect(Math.abs(card.art.top - card.art.bottom), `${card.title} art is off-centre`).toBeLessThanOrEqual(1);
       }
 
+      await page.close();
+    },
+    TEST_TIMEOUT,
+  );
+
+  it(
+    'lists Look\'n\'Feel as the first plugin',
+    async () => {
+      const page = await openSite();
+      const titles = await page.$$eval(
+        '#plugins [data-locale="es"] [data-project-page="0"] [data-card-open]',
+        (cards) => cards.map((card) => (card as HTMLElement).dataset.cardTitle ?? ''),
+      );
+      expect(titles).toEqual(["Look'n'Feel", 'devstack', 'Work connection']);
       await page.close();
     },
     TEST_TIMEOUT,
@@ -417,14 +432,15 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
       expect(box.left).toBeGreaterThanOrEqual(0);
       expect(box.right).toBeLessThanOrEqual(MOBILE.width + 1);
 
-      // The cluster sits on the reading column's gutter, lifted off the floor:
-      // at 16px it read as jammed into the viewport corner.
+      // The cluster sits on the reading column's gutter, lifted clear of the
+      // viewport floor: 16px read as jammed into the corner, 24px still hugged
+      // the bottom edge.
       const cluster = await page.$eval('[data-cmdk-open]', (el) => {
         const rect = el.parentElement!.getBoundingClientRect();
         return { right: rect.right, bottom: rect.bottom };
       });
       expect(Math.round(MOBILE.width - cluster.right), 'cluster right offset').toBe(24);
-      expect(Math.round(MOBILE.height - cluster.bottom), 'cluster bottom offset').toBe(24);
+      expect(Math.round(MOBILE.height - cluster.bottom), 'cluster bottom offset').toBe(56);
 
       await page.close();
     },

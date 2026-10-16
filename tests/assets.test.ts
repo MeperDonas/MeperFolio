@@ -16,6 +16,9 @@ const appAssets = Object.keys(
 const pluginAssets = Object.keys(
   import.meta.glob('../public/plugins/**/*', { eager: true, query: '?url' }),
 );
+const browserAssets = Object.keys(
+  import.meta.glob('../public/**/*.{ico,png,webmanifest}', { eager: true, query: '?url' }),
+);
 const projectFiles = import.meta.glob('../content/projects/*/*.md', {
   eager: true,
   query: '?raw',
@@ -64,6 +67,25 @@ describe('content assets', () => {
       const wanted = `public${fm.preview}`;
       if (!pluginAssets.some((key) => key.endsWith(wanted))) missing.push(`${path} -> ${wanted}`);
     }
+    expect(missing).toEqual([]);
+  });
+
+  it('ships the browser identity files the head advertises', () => {
+    // base.astro links these by path; a renamed or missing file would only show
+    // up as a blank tab icon in production.
+    const wanted = [
+      'public/favicon.ico',
+      'public/site.webmanifest',
+      'public/icons/MeperFolio/icon-32.png',
+      'public/icons/MeperFolio/icon-180.png',
+      'public/icons/MeperFolio/icon-192.png',
+      'public/icons/MeperFolio/icon-512.png',
+    ];
+    const missing = wanted.filter(
+      (path) =>
+        !appAssets.some((key) => key.endsWith(path)) &&
+        !browserAssets.some((key) => key.endsWith(path)),
+    );
     expect(missing).toEqual([]);
   });
 

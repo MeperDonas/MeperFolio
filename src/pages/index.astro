@@ -150,7 +150,7 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
       never be cut off no matter how tall it grows, and the controls stay
       reachable while the page scrolls.
     -->
-    <div class="fixed bottom-6 right-6 z-30 flex items-center gap-2 lg:bottom-auto lg:right-6 lg:top-6">
+    <div class="fixed bottom-14 right-6 z-30 flex items-center gap-2 lg:bottom-auto lg:right-6 lg:top-6">
       <button
         type="button"
         data-cmdk-open
@@ -403,7 +403,7 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
           </button>
         </div>
         <iframe
-          src={`${es.data.cv}#pagemode=thumbs&navpanes=1&view=FitH`}
+          src={`${es.data.cv}#pagemode=none&navpanes=0&view=FitH`}
           title="Curriculum Vitae"
           class="cv-modal-frame"
           loading="lazy"
@@ -433,7 +433,7 @@ const cvFileEn = en.data.cv?.split('/').pop() ?? '';
           </button>
         </div>
         <iframe
-          src={`${en.data.cv}#pagemode=thumbs&navpanes=1&view=FitH`}
+          src={`${en.data.cv}#pagemode=none&navpanes=0&view=FitH`}
           title="Resume"
           class="cv-modal-frame"
           loading="lazy"
