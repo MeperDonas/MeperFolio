@@ -1,7 +1,7 @@
 ---
 objective: Seven visual/content corrections to the portfolio: bigger project cover art, uniform project cards, BrokerApp on projects page 1, the Look'n'Feel plugin card, a marketplace redirect on plugin cards, a better narrow-width control cluster, and a CV preview that opens with the pages panel.
 branch: fix/visual-polish (from origin/main @ 58cebbd)
-delivery: ask-on-risk (single PR expected: forecast under 400 authored changed lines)
+delivery: PR #15 (fix/visual-polish -> main), opened 2026-10-16; merge is the owner's decision
 runner: vitest (npm test) + npx astro check + npm run build; rendered checks in tests/visual.test.ts need /usr/bin/chromium
 ---
 
@@ -129,5 +129,7 @@ L17 (verbatim, owner — third message):
 L18 — Both halves of that message resolve to the same cause, and it is not the code. "no le cambiaste el logo a looknfeel" is what the deployed site shows: the owner pushed round 1 straight to `main` (`50310ad`), and round 2 — with the Siamese cover — is still local and unpushed, so the running site renders round 1's tabby cover. The plugins section in that screenshot also still shows the old card order. Nothing to fix in the files; the branch has to reach the remote for the owner to see it.
 
 L19 — S11 rewritten after the owner's correction: the card was BrokerApp, not MeperBoard. Measurement that explains the complaint: every project icon in `public/apps/` matches an 80% centred crop of its brand-pack tile (RMSE 0.082-0.144 against candidate crops), and the BrokerApp tile is the only one whose cat has its ear tips inside that outer 10%, so it was the one cover rendering a clipped head. Rebuilt at 86% with the corners flattened onto the tile's own gold: the whole head, no clipping, no seams.
+
+L20 — Delivered: `fix/visual-polish` pushed and PR #15 opened (label `enhancement`, +160/-26 across 22 files, three commits). Review, merge and therefore what reaches `folio.mepersoft.app` stay the owner's decisions; `main` still carries round 1 until the PR is merged.
 
 
