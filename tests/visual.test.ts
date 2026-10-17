@@ -296,7 +296,7 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
   );
 
   it(
-    'renders every loaded project cover opaque, corners included',
+    'renders every project cover opaque, corners included, with no keyed holes',
     async () => {
       const page = await openSite();
       // Covers are lazy, so they only fetch once the section is in view. Waiting on
@@ -319,14 +319,27 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
             canvas.height = img.naturalHeight;
             const ctx = canvas.getContext('2d');
             ctx?.drawImage(img, 0, 0);
-            const px = (x: number, y: number) => Array.from(ctx?.getImageData(x, y, 1, 1).data ?? []);
+            const data = ctx?.getImageData(0, 0, canvas.width, canvas.height).data ?? new Uint8ClampedArray();
+            const alphaAt = (x: number, y: number) => data[(y * canvas.width + x) * 4 + 3];
+            // Two bugs live here. A transparent corner is the frame showing through
+            // (the tile's rounded edge or the pack's white ring), and a transparent
+            // patch inside is a keyed hole where the light fur was. The covers are
+            // full-bleed squares, so both are wrong now.
+            const inset = Math.round(canvas.width * 0.12);
+            let holes = 0;
+            for (let y = inset; y < canvas.height - inset; y += 1) {
+              for (let x = inset; x < canvas.width - inset; x += 1) {
+                if (alphaAt(x, y) < 255) holes += 1;
+              }
+            }
             return {
               src: img.getAttribute('src') ?? '',
+              holes,
               corners: {
-                'top-left': px(0, 0),
-                'top-right': px(canvas.width - 1, 0),
-                'bottom-left': px(0, canvas.height - 1),
-                'bottom-right': px(canvas.width - 1, canvas.height - 1),
+                'top-left': alphaAt(0, 0),
+                'top-right': alphaAt(canvas.width - 1, 0),
+                'bottom-left': alphaAt(0, canvas.height - 1),
+                'bottom-right': alphaAt(canvas.width - 1, canvas.height - 1),
               },
             };
           }),
@@ -334,12 +347,33 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
 
       expect(covers.length, 'at least one cover must be measurable').toBeGreaterThan(0);
       for (const cover of covers) {
-        for (const [corner, pixel] of Object.entries(cover.corners)) {
-          // A transparent or black corner is the bug that shipped twice: keying the
-          // art's light background punched the mascots' white fur into holes.
-          expect(pixel[3], `${cover.src} ${corner} alpha`).toBe(255);
+        expect(cover.holes, `${cover.src} has transparent pixels inside it`).toBe(0);
+        for (const [corner, alpha] of Object.entries(cover.corners)) {
+          expect(alpha, `${cover.src} ${corner} alpha`).toBe(255);
         }
       }
+      await page.close();
+    },
+    TEST_TIMEOUT,
+  );
+
+  it(
+    'animates the experience timeline and stops under reduced motion',
+    async () => {
+      const page = await openSite();
+      await page.evaluate(() => document.getElementById('experience')?.scrollIntoView());
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      const sheen = () =>
+        page.evaluate(() => {
+          const line = document.querySelector('.timeline-line');
+          return line ? getComputedStyle(line, '::after').animationName : null;
+        });
+
+      expect(await sheen(), 'the rail must carry its sheen').toBe('timeline-sheen');
+
+      await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+      expect(await sheen(), 'reduced motion must stop the sheen').toBe('none');
       await page.close();
     },
     TEST_TIMEOUT,
@@ -437,10 +471,25 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
       // the bottom edge.
       const cluster = await page.$eval('[data-cmdk-open]', (el) => {
         const rect = el.parentElement!.getBoundingClientRect();
-        return { right: rect.right, bottom: rect.bottom };
+        return { left: rect.left, right: rect.right, bottom: rect.bottom };
       });
-      expect(Math.round(MOBILE.width - cluster.right), 'cluster right offset').toBe(24);
+      expect(Math.round(MOBILE.width - cluster.right), 'cluster right offset').toBe(4);
       expect(Math.round(MOBILE.height - cluster.bottom), 'cluster bottom offset').toBe(56);
+
+      // The point of that offset: the cluster lives in the strip the content
+      // leaves free, so it never sits over a card or a line of text.
+      const widestContent = await page.evaluate(() =>
+        Math.max(
+          ...Array.from(
+            document.querySelectorAll(
+              '#projects [data-locale="es"] [data-card-open], #plugins [data-locale="es"] [data-card-open]',
+            ),
+          ).map((el) => el.getBoundingClientRect().right),
+        ),
+      );
+      expect(cluster.left, 'the cluster must clear the content it floats over').toBeGreaterThanOrEqual(
+        Math.round(widestContent),
+      );
 
       // And it is a column, not a row: the four controls share one centre line and
       // stack downward, in DOM order. In a row they consumed most of the width.

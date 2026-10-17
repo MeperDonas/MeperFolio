@@ -884,9 +884,14 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Experience timeline: the line draws and the dot pops when its item reveals
+ * Experience timeline: the line draws in on reveal, then a slow accent sheen
+ * travels down the rail. The draw-in is the entrance; the sheen is the
+ * continuous motion the owner asked for, and it is clipped to the 1px column so
+ * it never paints outside the rail. Reduced motion above drops it entirely.
  * ------------------------------------------------------------------------- */
 .timeline-line {
+  position: relative;
+  overflow: hidden;
   transform: scaleY(0);
   transform-origin: top;
   background: linear-gradient(to bottom, var(--color-hairline-strong), var(--color-hairline));
@@ -895,6 +900,26 @@
 
 [data-reveal].is-visible .timeline-line {
   transform: scaleY(1);
+}
+
+.timeline-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 25%,
+    color-mix(in oklch, var(--color-primary) 85%, white) 50%,
+    transparent 75%
+  );
+  transform: translateY(-100%);
+  animation: timeline-sheen 4.5s cubic-bezier(0.45, 0, 0.35, 1) 1.1s infinite;
+}
+
+@keyframes timeline-sheen {
+  to {
+    transform: translateY(100%);
+  }
 }
 
 .timeline-dot {
@@ -1147,6 +1172,10 @@
   .timeline-dot {
     transform: none;
     transition: none;
+  }
+
+  .timeline-line::after {
+    animation: none;
   }
 
   .split-nav a,
