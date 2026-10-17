@@ -46,9 +46,25 @@ S10 — Look'n'Feel is the first plugin and carries the mascot art the owner sen
 Quote: "dejame look'n'feel de primer plugin y cambile el icono por este: [Image 5]"
 Acceptance: the plugins list opens with `Look'n'Feel`, then `devstack`, then `Work connection` (both locales, by content filename order), and its cover is the sent art — the Siamese on terracotta, shipped as `/plugins/looknfeel.webp`, an 88% centred crop of the file's rounded tile so no surround colour reaches the corners.
 
-S11 — BrokerApp's cover carries the sent Luna art, whole head and no zoom. Corrected twice by the owner: first "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie", then a side-by-side: "la del sitio [Image 1] ... la que tienes que usar [Image 2]".
-Reading, settled by the second round's comparison: the mascot was never wrong — the framing was. The site's icons are 80% centred crops of their brand-pack tiles, and Luna's tile is the only one whose ear tips fall inside that outer 10%, so it was the single card rendering a clipped head; an 86% crop still zoomed too far. Acceptance: `public/apps/brokerapp/icon.webp` is the whole tile — trimmed, not cropped — with the rounded tile's transparent corners flood-filled and flattened onto the tile's own gold (`srgb(246,205,139)`), opaque, square 512x512, so the card shows the head with its margins exactly as the art does.
-Status: done. History: 80% crop (round 1) -> 86% crop -> the whole tile.
+S11 — The project covers are full-bleed squares built from the art the owner points at, with whole heads, no frames and no recolouring.
+Quotes, five rounds of them: "el logo de meperboard, cambia esa imagen por esta"; "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie"; "eso que hiciste con la foto de Luna, de acomodar mejor el margen para no cortar als orejas hazlo con las demas, sin alterar la imagen en si /home/meper/Projects/iconos mepersoft/"; "luna origuinalmente es toda negra"; "no quiero dobles marcos y se deben adapatar al estilo cuadrado que tiene mi sitio"; "con Luna pudiste hacerlo sin tenerle que cortar las orejas, lastima lo del color del fondo que se le ve. Pero si logras hacer eso con todos sin cambiarme los colores super bien".
+Reading, settled by measurement: the pack at `iconos mepersoft/` is the art the owner wants (the v2 pack in `~/Downloads` is the same drawings but ~10% brighter with a white ring around each tile, so it was dropped). That pack has keyed-out light fur — 9.5% of Luna's canvas, 9.4% of Mochi's, 3.3% of Yummi's — plus the tile's own rounded frame, and a 92% crop cannot remove the frame without clipping Luna's ear tips (the site's original 80% crop is exactly that bug).
+Acceptance: each `public/apps/*/icon.webp` is the pack's `icon-1024.png` with every transparent region filled by **diffusion** — 60 passes of a 20px blur with the opaque pixels restored each pass, so the tile's rounded corners and the keyed fur take the colour of what surrounds them (gold at Luna's top corners, fur at the bottom, black where her chest was). Then resized to a 512x512 **square**, fully opaque, no crop, no recolouring, and the whole head visible. Verified: 0% transparent pixels in all five, every rendered cover's four corners at alpha 255, and no transparent patch inside.
+Status: done. History: 80% crop of the old pack (round 1) -> 86% crop -> whole tile with gold-filled corners -> v2 whole tile with transparent corners -> this.
+
+S17 — No double frames, and the icons follow the site's square style.
+Quote: "no quiero dobles marcos y se deben adapatar al estilo cuadrado que tiene mi sitio".
+Acceptance: no project cover shows a second frame — neither the art's rounded tile edge nor the pack's white/dark ring — and none relies on transparency, which is what let the card's background read as a frame. The renders are square, opaque, and the cover keeps the site's zero-radius geometry: the image fills its box at 92% with no rounding of its own.
+
+S14 — Below `lg` the controls live in the strip the content leaves free.
+Quote: "Los botones me gustan asi, pero mira que quiero que permanezcan siempre en medio del borde y del margen que mantiene el scroll de las secciones asi: [Image 2] para siempre evitar que queden encima de alguna card o texto".
+Acceptance: below `lg` the cluster keeps its column, its 56px lift and its bottom-right anchor, and moves into the corridor: 4px off the right edge on phones and 10px from `sm` up, so its left edge is never left of the widest card. `lg` keeps the single row at the top-right. Measured at 390x844: cluster left 345 against a content right edge of 338.
+
+S15 — The experience timeline moves.
+Quote: "Le puedes poenr alguna animacion o sensacion de movimiento a esta linea en experiencie [Image 3]?"
+Acceptance: the rail keeps its draw-in on reveal and adds a slow accent sheen travelling down it (4.5s, clipped to the 1px column), and `prefers-reduced-motion: reduce` removes the animation entirely. Verified in a real browser both ways: the computed `::after` animation is `timeline-sheen` normally and `none` under reduced motion, and two frames of the rail 1.7s apart differ.
+
+S16 — Mobile has no horizontal overflow. Found while implementing S14: the plugin cards' `truncate` line made their min-content 504px inside a 390px viewport, so the whole page scrolled sideways and the cards ran under the cluster. Acceptance: `document.documentElement.scrollWidth` equals the viewport width at 390px, every card is 285px wide, and the widest card edge (338) clears the cluster (345).
 
 S13 — Below `lg` the control cluster stacks vertically.
 Quote: "sigo esperando que estas opciones en responsive mobile se ajusten en vertical y no en horizontal", with a crop of the four controls sitting in a row across the narrow viewport.
@@ -78,6 +94,11 @@ T17 (S1/S6/S9/S10) Test updates: art share floor raised to 0.85, mobile cluster 
 T18 (S11) BrokerApp cover rebuilt from the Luna tile: 86% centred crop (the tile's rounded-corner inset measures 8.69%), transparent corners flattened onto the tile's own gold, 512x512 opaque webp — inline — superseded by T19.
 T19 (S11) BrokerApp cover rebuilt again, this time from the whole tile: `-trim` (no crop), the four transparent corner regions flood-filled and the anti-aliased edge flattened onto `srgb(246,205,139)`, forced to a square 512x512 — inline — done. The card now renders the head with the margins the art itself has. Rejected on the way: a blurred-zooomed backdrop (pulled the dark fur into the corners) and an RGB dilation (smeared the whole art).
 T20 (S13) Cluster: `flex-col items-end` below `lg`, `lg:flex-row lg:items-center` above it, plus the comment, the structural regex and the rendered column assertions — inline — done. Measured at 390x844: centres within 1px, tops strictly increasing, cluster 24px/56px off the edges.
+T21 (S14) Cluster moved into the content corridor: `right-1` and `sm:right-2.5` below `lg`, keeping the 56px lift and the column — inline — done. Measured at 390x844: cluster 345-386 against a 338px content edge.
+T22 (S15) Experience rail: draw-in kept, a 4.5s accent sheen added, clipped to the 1px column and switched off under reduced motion — inline — done. Verified both ways in the browser and by two rail frames 1.7s apart differing.
+T23 (S16) Mobile overflow: plugin cards no longer force 504px inside a 390px viewport (`min-w-0` on the card plus explicit `minmax(0,1fr)` grid columns in both pagers) — inline — done. `scrollWidth` is now 390 and every card is 285px wide.
+T24 (S11/S17) All five project covers rebuilt from the pack at `iconos mepersoft/` by diffusion fill (60 passes, 20px blur, opaque pixels restored each pass), resized to square 512x512, fully opaque, no crop — inline — done. Luna keeps her whole head and is all black; no cover shows a second frame or a transparent edge.
+T25 (S11) The cover check went back to its strict form — every corner opaque — and keeps the keyed-hole scan, now over the whole interior — inline — done. Suite 71/71.
 
 ## Log
 
@@ -147,6 +168,18 @@ L22 — The frame comparison is the useful part: the site's cover clipped the ea
 L23 — S13 also retro-explains S6: the owner's "quede mejor sobre el borde hacia arriba" was about the controls stacking upward in a column, which the 56px lift alone could not deliver. Both are in place now: column below `lg`, single row at `lg`.
 
 L24 — Verification for this round: suite 69/69, `astro check` 0 errors, build exit 0; rendered pass confirming the 24px/56px anchors, the shared centre line and the strictly increasing tops of the four controls, and the BrokerApp cover rendering 512x512 opaque with the gold corners.
+
+L25 (verbatim, owner — fifth and sixth messages):
+> [Image 1] ?????
+> Luna se volvio blanca ahora, gracias
+> [Image 1] [Image 2] [Image 3] ??? por que se ven asi de brillantes?
+> Una cosa recuerda que no quiero dobles marcos y se deben adapatar al estilo cuadrado que tiene mi sitio
+> con Luna pudiste hacerlo sin tenerle que cortar las orejas, lastima lo del color le fondo que se le ve. Pero si logras hacer eso con todos sin cambiarme los colores super bien
+
+L26 — The diffs the owner was reading were mine, uncommitted, in their editor: left the committed file, right the working tree. Two conclusions came out of that exchange. First, the v2 pack is the same drawings but brighter and it wraps each tile in a white ring, so it was dropped even though it is the only pack without keyed holes: the brightness and the ring are visible regressions against the art the owner approves. Second, "dobles marcos" plus "estilo cuadrado" settles the shape: the covers must be opaque squares with no tile edge, no ring and no cropping deep enough to touch the ears.
+
+L27 — Diffusion fill is what made those two constraints compatible: the pack's own pixels are never repainted (the opaque area is restored on every pass), so the fill only ever paints where the art had nothing — the rounded corners and the keyed fur. That is why Luna is all black now without inventing a colour, and why no ear had to be cut: nothing is cropped at all.
+
 
 
 
