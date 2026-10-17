@@ -54,10 +54,10 @@ describe('structural invariants', () => {
   it('keeps the control cluster reachable while scrolling', () => {
     // Absolute positioning scrolled the theme switch and the back-to-top away
     // with the page, which is exactly when you need them. Below lg the offsets
-    // are the content gutter (24px) and a clear lift off the viewport floor
-    // (56px): at 16px the cluster read as jammed into the corner, and at 24px it
-    // still hugged the bottom edge instead of sitting clear above it.
-    expect(index).toMatch(/fixed[^"]*bottom-14 right-6/);
+    // put the cluster in the strip the content leaves free: 4px off the right
+    // edge (10px from sm up) and 56px off the floor, so it clears both the cards
+    // and the footer instead of hugging the corner or sitting over text.
+    expect(index).toMatch(/fixed[^"]*bottom-14 right-1/);
     expect(index).toContain('data-theme-toggle');
     expect(index).toContain('data-scroll-top');
     // One column on the narrow layout, one row on lg: in a row the four controls
@@ -90,7 +90,7 @@ describe('structural invariants', () => {
     // identity column, which left two control groups on the same band. They belong
     // to the cluster at the top-right of <main>, which is also the only one that
     // escapes the column's overflow clipping.
-    const from = index.indexOf('bottom-14 right-6');
+    const from = index.indexOf('bottom-14 right-1');
     const to = index.indexOf('data-theme-menu');
     expect(from, 'the cluster must exist').toBeGreaterThan(0);
     expect(to, 'the theme menu must exist').toBeGreaterThan(from);
@@ -131,6 +131,16 @@ describe('structural invariants', () => {
     expect(plugins).toContain('data-card-marketplace');
     expect(index).toContain('data-card-modal-marketplace');
     expect(appTs).toContain('cardMarketplace');
+  });
+
+  it('keeps the experience timeline in motion', () => {
+    // The rail draws in on reveal (the entrance) and then carries a slow accent
+    // sheen, which is the "sensation of movement" the owner asked for. Both the
+    // keyframes and the reduced-motion switch-off are pinned, because an
+    // infinite animation that survives prefers-reduced-motion is a bug.
+    expect(globalCss).toContain('@keyframes timeline-sheen');
+    expect(globalCss).toMatch(/\.timeline-line::after[\s\S]{0,400}animation: timeline-sheen/);
+    expect(globalCss).toMatch(/prefers-reduced-motion[\s\S]{0,900}\.timeline-line::after\s*\{\s*animation: none/);
   });
 
   it('opens the CV preview without the pages panel', () => {

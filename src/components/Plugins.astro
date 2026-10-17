@@ -96,10 +96,10 @@ const t =
           the left and the content sits beside it. One row per plugin, still four
           per page inside the same static frame as the project grid.
         */}
-        <div class="mt-6 grid" data-project-pages>
+        <div class="mt-6 grid grid-cols-[minmax(0,1fr)]" data-project-pages>
           {pages.map((page, pageIndex) => (
             <div
-              class="project-page col-start-1 row-start-1 grid gap-4"
+              class="project-page col-start-1 row-start-1 grid grid-cols-[minmax(0,1fr)] gap-4"
               data-project-page={pageIndex}
               data-active={pageIndex === 0 ? 'true' : 'false'}
               aria-hidden={pageIndex === 0 ? 'false' : 'true'}
@@ -107,7 +107,7 @@ const t =
               {page.map((entry) => (
                 <button
                   type="button"
-                  class="reveal-card group flex items-stretch border border-hairline bg-canvas-deep text-left transition-colors duration-200 hover:border-primary"
+                  class="reveal-card group flex min-w-0 items-stretch border border-hairline bg-canvas-deep text-left transition-colors duration-200 hover:border-primary"
                   data-reveal
                   data-card-open
                   data-card-title={entry.data.title}
