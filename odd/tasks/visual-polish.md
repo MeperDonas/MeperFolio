@@ -47,10 +47,18 @@ Quote: "dejame look'n'feel de primer plugin y cambile el icono por este: [Image 
 Acceptance: the plugins list opens with `Look'n'Feel`, then `devstack`, then `Work connection` (both locales, by content filename order), and its cover is the sent art — the Siamese on terracotta, shipped as `/plugins/looknfeel.webp`, an 88% centred crop of the file's rounded tile so no surround colour reaches the corners.
 
 S11 — The project covers are full-bleed squares built from the art the owner points at, with whole heads, no frames and no recolouring.
-Quotes, five rounds of them: "el logo de meperboard, cambia esa imagen por esta"; "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie"; "eso que hiciste con la foto de Luna, de acomodar mejor el margen para no cortar als orejas hazlo con las demas, sin alterar la imagen en si /home/meper/Projects/iconos mepersoft/"; "luna origuinalmente es toda negra"; "no quiero dobles marcos y se deben adapatar al estilo cuadrado que tiene mi sitio"; "con Luna pudiste hacerlo sin tenerle que cortar las orejas, lastima lo del color del fondo que se le ve. Pero si logras hacer eso con todos sin cambiarme los colores super bien".
-Reading, settled by measurement: the pack at `iconos mepersoft/` is the art the owner wants (the v2 pack in `~/Downloads` is the same drawings but ~10% brighter with a white ring around each tile, so it was dropped). That pack has keyed-out light fur — 9.5% of Luna's canvas, 9.4% of Mochi's, 3.3% of Yummi's — plus the tile's own rounded frame, and a 92% crop cannot remove the frame without clipping Luna's ear tips (the site's original 80% crop is exactly that bug).
-Acceptance: each `public/apps/*/icon.webp` is the pack's `icon-1024.png` with every transparent region filled by **diffusion** — 60 passes of a 20px blur with the opaque pixels restored each pass, so the tile's rounded corners and the keyed fur take the colour of what surrounds them (gold at Luna's top corners, fur at the bottom, black where her chest was). Then resized to a 512x512 **square**, fully opaque, no crop, no recolouring, and the whole head visible. Verified: 0% transparent pixels in all five, every rendered cover's four corners at alpha 255, and no transparent patch inside.
-Status: done. History: 80% crop of the old pack (round 1) -> 86% crop -> whole tile with gold-filled corners -> v2 whole tile with transparent corners -> this.
+Quotes, seven rounds of them: "el logo de meperboard, cambia esa imagen por esta"; "NO, quiero que le cambias el gato al propio brokerapp por la luna que te envie"; "eso que hiciste con la foto de Luna, de acomodar mejor el margen para no cortar als orejas hazlo con las demas, sin alterar la imagen en si /home/meper/Projects/iconos mepersoft/"; "luna origuinalmente es toda negra"; "no quiero dobles marcos y se deben adapatar al estilo cuadrado que tiene mi sitio"; "con Luna pudiste hacerlo sin tenerle que cortar las orejas, lastima lo del color del fondo que se le ve. Pero si logras hacer eso con todos sin cambiarme los colores super bien"; and, over six crops of the covers' bottom edge, "bueno casi".
+Reading: the pack at `iconos mepersoft/` is the art the owner wants (the v2 pack is the same drawings but brighter, with a white ring, and — measured — not pixel-aligned, so it cannot even donate texture). That pack has keyed-out light fur (9.5% of Luna's canvas, 9.4% of Mochi's, 3.3% of Yummi's) and the tile's rounded frame; no crop removes the frame without clipping Luna's ear tips, and a flat fill leaves the washed band the owner photographed.
+Acceptance: each `public/apps/*/icon.webp` is the pack's `icon-1024.png` with the transparent areas filled in two stages — **diffusion** (60 passes of a 20px blur, the alpha-255 pixels restored every pass) for the rounded corners, then the **art's own fur rolled down by 140px** through a mask that keeps the corners out, so the keyed areas continue the fur instead of a flat wash. Nothing is cropped, no colour is invented, the result is a 512x512 opaque square, and the whole head stays visible. Verified: 0% transparency, every rendered corner at alpha 255, no transparent pixel inside, and the bottom edge carrying fur strokes.
+Status: done. History: 80% crop (round 1) -> 86% crop -> whole tile, gold corners -> v2 whole tile -> diffusion only -> diffusion plus rolled fur.
+
+S18 — The Look'n'Feel plugin cover keeps its ears.
+Quote: "el logo de looknfeel es el unico que tiene las orejas cortadas".
+Acceptance: `public/plugins/looknfeel.webp` is the owner's Siamese art **uncropped** (the 88% crop was what clipped the ears), with the grey surround flood-filled from the four canvas corners to the tile's own `srgb(197,102,72)`, so the cover is a full-bleed square with no grey and no rounded frame. The flood fill stops at the tile because the art around it is terracotta, so no colour keying can leak into the cat.
+
+S19 — The project cover art sits a little smaller.
+Quote: "intenta hacer los iconos unpoco mas pequeños para que verticalmente funcionen".
+Acceptance: the icon renders at 84% of the cover box height instead of 92%, so the art keeps vertical air inside the box while still reading big. Pinned in the rendered check as a band (0.78 to 0.9 of the cover height).
 
 S17 — No double frames, and the icons follow the site's square style.
 Quote: "no quiero dobles marcos y se deben adapatar al estilo cuadrado que tiene mi sitio".
@@ -99,6 +107,9 @@ T22 (S15) Experience rail: draw-in kept, a 4.5s accent sheen added, clipped to t
 T23 (S16) Mobile overflow: plugin cards no longer force 504px inside a 390px viewport (`min-w-0` on the card plus explicit `minmax(0,1fr)` grid columns in both pagers) — inline — done. `scrollWidth` is now 390 and every card is 285px wide.
 T24 (S11/S17) All five project covers rebuilt from the pack at `iconos mepersoft/` by diffusion fill (60 passes, 20px blur, opaque pixels restored each pass), resized to square 512x512, fully opaque, no crop — inline — done. Luna keeps her whole head and is all black; no cover shows a second frame or a transparent edge.
 T25 (S11) The cover check went back to its strict form — every corner opaque — and keeps the keyed-hole scan, now over the whole interior — inline — done. Suite 71/71.
+T26 (S11) The five covers rebuilt again, this time with the art's own fur rolled 140px down through a corner-free mask on top of the diffusion fill, so the keyed fur areas continue as fur instead of a flat wash — inline — done. Measured: 512x512 `srgb`, 0% transparency, corners opaque, bottom edge carrying strokes.
+T27 (S18) The Look'n'Feel cover rebuilt from the uncropped Siamese art with the grey surround flood-filled to `srgb(197,102,72)` — inline — done. Ears intact; no grey, no frame.
+T28 (S19) Cover art from 92% to 84% of the box, rendered check pinned as a 0.78-0.9 band — inline — done. Suite 71/71 again after the change.
 
 ## Log
 
@@ -179,6 +190,16 @@ L25 (verbatim, owner — fifth and sixth messages):
 L26 — The diffs the owner was reading were mine, uncommitted, in their editor: left the committed file, right the working tree. Two conclusions came out of that exchange. First, the v2 pack is the same drawings but brighter and it wraps each tile in a white ring, so it was dropped even though it is the only pack without keyed holes: the brightness and the ring are visible regressions against the art the owner approves. Second, "dobles marcos" plus "estilo cuadrado" settles the shape: the covers must be opaque squares with no tile edge, no ring and no cropping deep enough to touch the ears.
 
 L27 — Diffusion fill is what made those two constraints compatible: the pack's own pixels are never repainted (the opaque area is restored on every pass), so the fill only ever paints where the art had nothing — the rounded corners and the keyed fur. That is why Luna is all black now without inventing a colour, and why no ear had to be cut: nothing is cropped at all.
+
+L28 (verbatim, owner — seventh message):
+> BUeno casi: [six crops of the covers' bottom edges]
+> [Image 7] el logo de looknfeel es el unico que tiene las orejas cortadas
+> [Image 8] intenta hacer los iconos unpoco mas pequeños para que verticalmente funcionen
+
+L29 — The crops showed what the diffusion alone could not do: a flat, washed band where the keyed fur was, because a smooth fill has no strokes. The fix was to let the art's own fur continue into the hole (a 140px downward roll through a mask that excludes the corners), and to keep diffusion only for the corner triangles, where the neighbouring colour really is flat. The alignment check settled the other candidate: the v2 pack measures 108-126 mean difference inside the art's opaque area, so it is not pixel-aligned and cannot donate texture even ignoring its brightness.
+
+L30 — The Look'n'Feel cover had the same class of bug as Luna at the start: an 88% crop that clipped the ears. Rebuilt uncropped, with the grey surround flood-filled from the four canvas corners — the flood cannot leak into the cat because the ring around it is terracotta, 36% away from the grey.
+
 
 
 

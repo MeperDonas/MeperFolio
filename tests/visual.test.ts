@@ -265,9 +265,11 @@ describe.runIf(hasBrowser)('rendered appearance', () => {
         expect(card.art, `${card.title} must render its cover art`).not.toBeNull();
         if (!card.art || !card.natural) continue;
         // "se pierde en el centro": the tile used to be 58% of the box height,
-        // then 76%; the owner asked for more both times, so this pins 92%.
+        // then 76% and 92%; 84% is the size where the art still reads big and
+        // keeps a little vertical air inside the box.
         const share = card.art.height / card.cover.height;
-        expect(share, `${card.title} cover art is too small`).toBeGreaterThanOrEqual(0.85);
+        expect(share, `${card.title} cover art is too small`).toBeGreaterThanOrEqual(0.78);
+        expect(share, `${card.title} cover art is too big`).toBeLessThanOrEqual(0.9);
         // Never stretched: the rendered ratio has to match the file's own.
         const rendered = card.art.width / card.art.height;
         const file = card.natural.width / card.natural.height;
