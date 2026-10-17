@@ -52,9 +52,9 @@ Reading, now settled: the showcase (`showcase/02_asset_distribution_showcase.png
 Acceptance: each `public/apps/*/icon.webp` is the pack's `icon-1024.png` **cropped to 88%** (which removes the tile's rounded corners and its edge shading while leaving the ear tips, measured between 7% and 10% from the edge, intact), then filled in two stages — diffusion for any residual corner transparency, the art's own fur rolled 120px down through a corner-free mask for the keyed holes — and resized to a 512x512 opaque square. No rim, no inner margin beyond the card's own, no invented colour, whole head.
 Status: done. History: 80% crop -> 86% crop -> whole tile, gold corners -> v2 whole tile -> diffusion only -> diffusion + rolled fur -> diffusion + rolled fur + 88% crop -> flat fur-coloured holes -> Luna's own-fur fill.
 
-S11b — Luna's chest is fur, not a flat patch.
-Quote: "todos estan bien, menos otra vez por difuminacion en la parte del centro abajo [Image 2] la negrita LUNA :(. SOlo ajusta esa".
-Reading: a flat fill has no strokes, so her chest read as a blurred smudge even with the right colour. Acceptance: Luna's hole is filled with **her own fur only** — the tile's gold is keyed out of the texture source first (a 14% colour key on the sampled tile colour), so the diffusion can only pull fur tones in, and a rolled copy of that fur-only source lays strokes on top. The corners keep the full-art diffusion, hence the tile's gold. Verified: the corner reads `srgb(244,202,137)` (the tile's own gold) and the chest reads fur-tone `srgb(76,70,63)` with visible hatching.
+S11b — Luna's chest is fur, not a flat patch, and not a second face.
+Quotes: "todos estan bien, menos otra vez por difuminacion en la parte del centro abajo [Image 2] la negrita LUNA :(. SOlo ajusta esa" and then "[Image 1] le hiciste la boca doble jaja".
+Reading: a flat fill has no strokes (the blur), and rolling the *face* area down carries the muzzle into the chest (the second mouth). Acceptance: Luna's hole is filled from two sources that cannot contain a face — the art **mirrored horizontally** (her flank fur lands where the hole is) and a roll of a fur-only source whose **face band is masked out** (a 22-78% by 30-58% rectangle), over the plain diffusion; the corners keep the full-art diffusion, hence the tile's gold. Verified: corner `srgb(244,202,137)`, chest samples `srgb(40,34,25)` / `srgb(60,57,51)` / `srgb(23,21,17)` — fur tones with strokes and no pale wash — and the card render shows no second mouth.
 
 S18 — The Look'n'Feel plugin cover is the art from the icons folder, uncropped.
 Quote: "la imagen original de looknfeel que ambien esta en la carpeta de iconos no tiene tanto zoom".
@@ -117,7 +117,8 @@ T28 (S19) Cover art from 92% to 84% of the box, rendered check pinned as a 0.78-
 T29 (S11/S18) Covers cropped to 88% before the fills (the frame gone, the ears kept) and the Look'n'Feel cover rebuilt from the icons-folder Siamese, uncropped with its surround flooded to `srgb(1,65,81)` — inline — done. Suite 71/71, `astro check` 0 errors, build exit 0; both sections reviewed in the render.
 T30 (S11) Holes filled flat with the colour they were cut from: white for Kiroi, Lucky, Mochi and Yummi, Luna's sampled fur for Luna — inline — done, `dc8b34d`. Fixed the blue patch on Mochi's forehead and the olive one on Luna's chest that the fur roll had dragged in.
 T31 (S18) Look'n'Feel cover rebuilt from the owner's own art at `iconos mepersoft/omarchy-plugins/loknfeel.jpg` (the file that moved out of Downloads) — inline — done, `dc8b34d`.
-T32 (S11b) Luna's hole filled with her own fur only: the tile's gold keyed out of the texture source, diffusion plus a rolled copy for strokes, corners still gold — inline — done. Verified: corner `srgb(244,202,137)`, chest `srgb(76,70,63)` with hatching.
+T32 (S11b) Luna's hole filled with her own fur only: the tile's gold keyed out of the texture source, diffusion plus a rolled copy for strokes, corners still gold — inline — done, superseded by T33 because the roll carried her muzzle down.
+T33 (S11b) Luna's hole filled from two face-free sources: the art mirrored horizontally inside the hole mask, plus a roll of the fur-only source with its face band masked out, over the diffusion — inline — done. Verified: no second mouth in the card render, corners stay the tile gold, chest samples in fur tones.
 
 ## Log
 
@@ -223,6 +224,11 @@ L34 (verbatim, owner — ninth message):
 L35 — Two corrections came out of that round and both are recorded above: the fur roll had been dragging the tile's background into the holes (blue on Mochi's forehead, olive on Luna's chest), which flat fur-coloured fills fixed; and the owner's Siamese art had moved out of Downloads into the icons pack as `omarchy-plugins/loknfeel.jpg`, which is why my script could not find it.
 
 L36 — The last one is a lesson about fills: the colour was right but a flat fill has no strokes, so Luna's chest read as a blur. Keying the tile's gold out of the *texture source* before diffusing it is what makes a fill that is both the right colour and textured — the fill can then only pull fur tones, and a rolled copy of that same fur-only source lays the strokes.
+
+L37 (verbatim, owner — tenth message):
+> [Image 1] le hicisye la boca doble jaja [Image 2]
+
+L38 — The roll was still pulling from the wrong place: rolling the art down carried her *muzzle* into the chest, so the cover showed a second mouth, and the fur-only diffusion underneath left a pale wash where the whiskers had been keyed in. The fill now takes its texture from two sources that cannot contain a face — the art mirrored horizontally, and a roll of the fur-only source with its face band masked out — which keeps the strokes and drops the duplication. The lesson generalises: when filling with a shifted copy of an art, mask out whatever the shift would bring along that must not repeat.
 
 
 
