@@ -52,9 +52,9 @@ Reading, now settled: the showcase (`showcase/02_asset_distribution_showcase.png
 Acceptance: each `public/apps/*/icon.webp` is the pack's `icon-1024.png` **cropped to 88%** (which removes the tile's rounded corners and its edge shading while leaving the ear tips, measured between 7% and 10% from the edge, intact), then filled in two stages — diffusion for any residual corner transparency, the art's own fur rolled 120px down through a corner-free mask for the keyed holes — and resized to a 512x512 opaque square. No rim, no inner margin beyond the card's own, no invented colour, whole head.
 Status: done. History: 80% crop -> 86% crop -> whole tile, gold corners -> v2 whole tile -> diffusion only -> diffusion + rolled fur -> diffusion + rolled fur + 88% crop -> flat fur-coloured holes -> Luna's own-fur fill.
 
-S11b — Luna's chest is fur, not a flat patch, and not a second face.
-Quotes: "todos estan bien, menos otra vez por difuminacion en la parte del centro abajo [Image 2] la negrita LUNA :(. SOlo ajusta esa" and then "[Image 1] le hiciste la boca doble jaja".
-Reading: a flat fill has no strokes (the blur), and rolling the *face* area down carries the muzzle into the chest (the second mouth). Acceptance: Luna's hole is filled from two sources that cannot contain a face — the art **mirrored horizontally** (her flank fur lands where the hole is) and a roll of a fur-only source whose **face band is masked out** (a 22-78% by 30-58% rectangle), over the plain diffusion; the corners keep the full-art diffusion, hence the tile's gold. Verified: corner `srgb(244,202,137)`, chest samples `srgb(40,34,25)` / `srgb(60,57,51)` / `srgb(23,21,17)` — fur tones with strokes and no pale wash — and the card render shows no second mouth.
+S11b — Luna's chest is fur, not a flat patch, not a second face, and not a visible patch.
+Quotes: "todos estan bien, menos otra vez por difuminacion en la parte del centro abajo [Image 2] la negrita LUNA :(. SOlo ajusta esa" then "[Image 1] le hiciste la boca doble jaja".
+Reading, after six fills: a flat fill blurs; rolling her art down carries the muzzle into the chest; mirroring it copies the same rows the muzzle lives in (a ghost nose); and a tiled patch from her forehead shows as a box with the wrong tone. What works is the pack's newer file, whose chest the artist *did* paint: `-subimage-search` registers it (same scale, offset +88+87, residual 0.14 against 0.42 unaligned) and its chest pixels are tone-matched to the fur ring around the hole and feathered in. Acceptance: Luna's hole shows painted fur, the corners keep the full-art diffusion (the tile's gold `srgb(244,202,137)`), and the card render shows no second mouth, no ghost nose, no box and no pale wash.
 
 S18 — The Look'n'Feel plugin cover is the art from the icons folder, uncropped.
 Quote: "la imagen original de looknfeel que ambien esta en la carpeta de iconos no tiene tanto zoom".
@@ -118,7 +118,8 @@ T29 (S11/S18) Covers cropped to 88% before the fills (the frame gone, the ears k
 T30 (S11) Holes filled flat with the colour they were cut from: white for Kiroi, Lucky, Mochi and Yummi, Luna's sampled fur for Luna — inline — done, `dc8b34d`. Fixed the blue patch on Mochi's forehead and the olive one on Luna's chest that the fur roll had dragged in.
 T31 (S18) Look'n'Feel cover rebuilt from the owner's own art at `iconos mepersoft/omarchy-plugins/loknfeel.jpg` (the file that moved out of Downloads) — inline — done, `dc8b34d`.
 T32 (S11b) Luna's hole filled with her own fur only: the tile's gold keyed out of the texture source, diffusion plus a rolled copy for strokes, corners still gold — inline — done, superseded by T33 because the roll carried her muzzle down.
-T33 (S11b) Luna's hole filled from two face-free sources: the art mirrored horizontally inside the hole mask, plus a roll of the fur-only source with its face band masked out, over the diffusion — inline — done. Verified: no second mouth in the card render, corners stay the tile gold, chest samples in fur tones.
+T33 (S11b) Luna's hole filled from two face-free sources: the art mirrored horizontally inside the hole mask, plus a roll of the fur-only source with its face band masked out, over the diffusion — inline — done, superseded by T34: the mirror copies the same rows the muzzle lives in, so it produced a ghost nose.
+T34 (S11b) Luna's hole filled from the pack's newer file, registered with `-subimage-search` (same scale, +88+87), tone-matched to the fur ring around the hole and feathered — inline — done. Verified in the card render: painted fur, no second mouth, no ghost nose, no box, corners still the tile's gold. Six fills were tried in total; the rejected ones are recorded in the Log because each failure mode is a trap worth remembering.
 
 ## Log
 
@@ -229,6 +230,12 @@ L37 (verbatim, owner — tenth message):
 > [Image 1] le hicisye la boca doble jaja [Image 2]
 
 L38 — The roll was still pulling from the wrong place: rolling the art down carried her *muzzle* into the chest, so the cover showed a second mouth, and the fur-only diffusion underneath left a pale wash where the whiskers had been keyed in. The fill now takes its texture from two sources that cannot contain a face — the art mirrored horizontally, and a roll of the fur-only source with its face band masked out — which keeps the strokes and drops the duplication. The lesson generalises: when filling with a shifted copy of an art, mask out whatever the shift would bring along that must not repeat.
+
+L39 (verbatim, owner — eleventh message):
+> [Image 1] xd
+
+L40 — That "xd" was a ghost nose: the *mirror* copies the same rows the muzzle lives in, so putting the art's right half into the left of the hole duplicated the nose. Six fills were tried on this one hole, and the traps are worth naming: a flat fill blurs; a downward roll carries the muzzle down; a mirror duplicates the same rows; a tiled forehead patch shows as a box with the wrong tone; masking the roll's face band leaves a seam. What worked was the pack's *newer* file, where the artist painted the chest: `-subimage-search` registers it against the old art (same scale, offset +88+87, residual 0.14 versus 0.42 unaligned) and those pixels are tone-matched and feathered into the hole.
+
 
 
 
